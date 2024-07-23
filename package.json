@@ -15,8 +15,18 @@
         "panel"
     ],
     "dependencies": {
-        "@swc-react/button": "0.39.4",
-        "@swc-react/theme": "0.39.4",
+        "@swc-react/action-button": "^0.44.0",
+        "@swc-react/button": "^0.44.0",
+        "@swc-react/field-label": "^0.44.0",
+        "@swc-react/icon": "^0.44.0",
+        "@swc-react/icons": "^0.44.0",
+        "@swc-react/icons-ui": "^0.44.0",
+        "@swc-react/menu": "^0.44.0",
+        "@swc-react/number-field": "^0.44.0",
+        "@swc-react/picker": "^0.44.0",
+        "@swc-react/table": "^0.44.0",
+        "@swc-react/tabs": "^0.44.0",
+        "@swc-react/theme": "^0.44.0",
         "react": "18.2.0",
         "react-dom": "18.2.0"
     },

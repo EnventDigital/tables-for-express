@@ -5,13 +5,13 @@ import "@spectrum-web-components/theme/express/theme-light.js";
 
 // To learn more about using "swc-react" visit:
 // https://opensource.adobe.com/spectrum-web-components/using-swc-react/
-import { Button } from "@swc-react/button";
 import { Theme } from "@swc-react/theme";
 import React from "react";
 import { DocumentSandboxApi } from "../../models/DocumentSandboxApi";
 import "./App.css";
 
 import { AddOnSDKAPI } from "https://new.express.adobe.com/static/add-on-sdk/sdk.js";
+import AddTables from "../pages/AddTable";
 
 const App = ({ addOnUISdk, sandboxProxy }: { addOnUISdk: AddOnSDKAPI; sandboxProxy: DocumentSandboxApi }) => {
     function handleClick() {
@@ -23,9 +23,7 @@ const App = ({ addOnUISdk, sandboxProxy }: { addOnUISdk: AddOnSDKAPI; sandboxPro
         // You may use "addOnUISdk.app.ui.theme" to get the current theme and react accordingly.
         <Theme theme="express" scale="medium" color="light">
             <div className="container">
-                <Button size="m" onClick={handleClick}>
-                    Create Rectangle
-                </Button>
+                <AddTables/>
             </div>
         </Theme>
     );
