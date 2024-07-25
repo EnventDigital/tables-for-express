@@ -36,7 +36,7 @@ const Tables: React.FC<ITableProps> = ({ fontFamily, fontType, textAlignment, co
     });
 
     return (
-        <div className='table-container '>
+        <div className='table-container ' id="example-table">
             <ReactTabulator
                 data={rowData}
                 columns={columnDefinitions}

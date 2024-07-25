@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { NumberField, NumberFieldType } from '@swc-react/number-field';
 import { Picker, PickerType } from '@swc-react/picker';
 import { FieldLabel, FieldLabelType } from '@swc-react/field-label';
+import Papa from 'papaparse';
 import {
     MenuItem
 } from '@swc-react/menu';
@@ -46,7 +47,24 @@ const Data: React.FC<IDataProps> = ({ columns, rows, setRows, setColumns, setCol
         const file = event.target.files?.[0];
         if (file) {
             setFileName(file.name);
-            console.log("yes");
+            Papa.parse(file, {
+                complete: (results) => {
+                    const parsedData = results.data;
+                    if (parsedData.length > 0) {
+                        // Extract column headers
+                        const headers = Object.keys(parsedData[0]);
+                        const cols = headers.map((header) => ({
+                            title: header,
+                            field: header,
+                            hozAlign: "left" as "left", // Default alignment
+                          }));
+                        setColumns(cols);
+                        console.log(cols);
+                        setRows(parsedData);
+                    }
+                },
+                header: true // Automatically use the first row as headers
+            });
         }
     };
 
@@ -87,7 +105,7 @@ const Data: React.FC<IDataProps> = ({ columns, rows, setRows, setColumns, setCol
                     <label htmlFor="fileInput">
                         <Button size='m'>Import</Button>
                     </label>
-                    <Button variant='primary' style={{marginLeft: '0.4rem'}} onClick={handleReset}>Reset</Button>
+                    <Button variant='primary' style={{ marginLeft: '0.4rem' }} onClick={handleReset}>Reset</Button>
                 </div>
             </div>}
             <div className='rows_col'>
