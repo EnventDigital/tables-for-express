@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Picker, PickerType } from '@swc-react/picker';
 import { FieldLabel, FieldLabelType } from '@swc-react/field-label';
 import {
@@ -6,17 +6,32 @@ import {
 } from '@swc-react/menu';
 import './App.css'
 import { winFontsC } from '../utils/font';
-const Options: React.FC = () => {
+
+type IOptions={
+    setFontFamily:React.Dispatch<React.SetStateAction<string>>,
+    setFontType:React.Dispatch<React.SetStateAction<string>>,
+    setTextAlignment:React.Dispatch<React.SetStateAction<string>>
+}
+
+const Options: React.FC<IOptions> = ({setFontFamily, setFontType, setTextAlignment}) => {
     const position = [
-        { key: 'left', value: 'Left' },
-        { key: 'right', value: 'Right' },
-        { key: 'center', value: 'Center' },
-        { key: 'justify', value: 'Justify' }
+        { key: 'left', value: 'left' },
+        { key: 'right', value: 'right' },
+        { key: 'center', value: 'center' },
     ];
     
     const handleFontChange = (event: any) => {
+        console.log(event);
+        const { id, value } = event.target;
+        if (id === 'font-family') {
+            setFontFamily(value);
+        } else if (id === 'font-type') {
+            setFontType(value);
+        } else if (id === 'text-alignment') {
+            setTextAlignment(value);
+        }
+    };
 
-    }
     return (
         <div className='option'>
             <div className='rows_col'>
@@ -42,9 +57,9 @@ const Options: React.FC = () => {
                         id='font-type' size="m" label="Selection type" placeholder='Font type'
                         change={(e) => handleFontChange(e)}
                     >
-                        <MenuItem key={'normal'} value='Normal'>Normal</MenuItem>
-                        <MenuItem key={'bold'} value='Bold'>Bold</MenuItem>
-                        <MenuItem key={'italics'} value='Italics'>Italics</MenuItem>
+                        <MenuItem key={'normal'} value='normal'>Normal</MenuItem>
+                        <MenuItem key={'bold'} value='bold'>Bold</MenuItem>
+                        <MenuItem key={'italic'} value='italic'>Italics</MenuItem>
                     </Picker>
                 </div>
             </div>

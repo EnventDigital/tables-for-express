@@ -6,15 +6,17 @@ import {
 } from '@swc-react/tabs';
 import '../components/App.css'
 import Data from '../components/Data';
-import Design from '../components/Design'; 
+import Design from '../components/Design';
 import Options from '../components/Options';
-import Tables from '../components/Table';
+import Tables from '../components/Table'; 
 
-
-const AddTables:React.FC  = () => {
+const AddTables: React.FC = () => {
     const [rows, setRows] = useState<number>(0);
     const [columns, setColumns] = useState<number>(0);
     const [columnValues, setColumnValues] = useState<{ [key: string]: string }>({});
+    const [fontFamily, setFontFamily] = useState<string>('Arial');
+    const [fontType, setFontType] = useState<string>('normal');
+    const [textAlignment, setTextAlignment] = useState<"left" | "center" | "right">('left');
     return (
         <div>
             <h2>Add Table</h2>
@@ -22,13 +24,13 @@ const AddTables:React.FC  = () => {
                 <Tab label="Data" value="Data"></Tab>
                 <Tab label="Design" value="Design"></Tab>
                 <Tab label="Options" value="Options"></Tab>
-                <TabPanel value="Design"><Design/></TabPanel>
+                <TabPanel value="Design"><Design /></TabPanel>
                 <TabPanel value="Data"><Data columns={columns} rows={rows} setColumnValues={setColumnValues} setColumns={setColumns} setRows={setRows} /></TabPanel>
-                <TabPanel value="Options"><Options/></TabPanel>
+                <TabPanel value="Options"><Options setFontFamily={setFontFamily} setFontType={setFontType} setTextAlignment={setTextAlignment}/></TabPanel>
             </Tabs>
-            <Tables columns={columns} columnValues={columnValues} rows={rows}/>
+            <Tables columnValues={columnValues} columns={columns} rows={rows} fontFamily={fontFamily} fontType={fontType} textAlignment={textAlignment}/>
         </div>
     );
 }
- 
+
 export default AddTables;
