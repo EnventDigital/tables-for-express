@@ -6,6 +6,9 @@ import { ReactTabulator, ColumnDefinition } from 'react-tabulator'
 
 type ITableProps = {
     columns?: number,
+    csvData: ColumnDefinition[],
+    rowData: any[],
+    disable: boolean,
     rows?: number,
     columnValues?: { [key: string]: string }
     fontFamily: string,
@@ -13,8 +16,8 @@ type ITableProps = {
     textAlignment: "left" | "center" | "right"
 }
 
-const Tables: React.FC<ITableProps> = ({ fontFamily, fontType, textAlignment, columns, columnValues, rows }) => {
-    const columnDefinitions: ColumnDefinition[] = Array.from({ length: columns }).map((_, index) => ({
+const Tables: React.FC<ITableProps> = ({  rowData, disable, csvData, fontFamily, fontType, textAlignment, columns, columnValues, rows }) => {
+    const columnDefinitions: ColumnDefinition[] = disable ? csvData : Array.from({ length: columns }).map((_, index) => ({
         title: columnValues[`Column ${index + 1}`] || `Column ${index + 1}`,
         field: `field${index + 1}`,
         width: 150,
@@ -27,7 +30,7 @@ const Tables: React.FC<ITableProps> = ({ fontFamily, fontType, textAlignment, co
         }),
     }));
 
-    const rowData = Array.from({ length: rows }).map((_, rowIndex) => {
+    const rowDatas = disable ? rowData : Array.from({ length: rows }).map((_, rowIndex) => {
         const row = {};
         Array.from({ length: columns }).forEach((_, colIndex) => {
             row[`field${colIndex + 1}`] = `Row ${rowIndex + 1} Col ${colIndex + 1}`;
@@ -38,7 +41,7 @@ const Tables: React.FC<ITableProps> = ({ fontFamily, fontType, textAlignment, co
     return (
         <div className='table-container ' id="example-table">
             <ReactTabulator
-                data={rowData}
+                data={rowDatas}
                 columns={columnDefinitions}
                 layout={"fitData"}
                 options={{

@@ -9,19 +9,23 @@ import {
 
 import './App.css'
 import { Button } from '@swc-react/button';
+import { ColumnDefinition, ReactTabulator } from 'react-tabulator';
 
 
 type IDataProps = {
     columns: number,
     rows: number,
+    disable: boolean,
     setRows: React.Dispatch<React.SetStateAction<number>>,
     setColumns: React.Dispatch<React.SetStateAction<number>>,
+    setDisable: React.Dispatch<React.SetStateAction<boolean>>
+    setCsvData: React.Dispatch<React.SetStateAction<ColumnDefinition[]>>
+    setRowData: React.Dispatch<React.SetStateAction<any[]>>
     setColumnValues: React.Dispatch<React.SetStateAction<{
         [key: string]: string;
     }>>
 }
-const Data: React.FC<IDataProps> = ({ columns, rows, setRows, setColumns, setColumnValues }) => {
-    const [csvData, setCsvData] = useState<any[]>([]);
+const Data: React.FC<IDataProps> = ({ disable, columns, rows, setRowData, setCsvData, setRows, setColumns, setColumnValues, setDisable }) => {
     const [fileName, setFileName] = useState<string>('');
     const [isPaidUser, setIsPaidUser] = useState<boolean>(true);
 
@@ -46,6 +50,7 @@ const Data: React.FC<IDataProps> = ({ columns, rows, setRows, setColumns, setCol
     const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0];
         if (file) {
+            setDisable(true)
             setFileName(file.name);
             Papa.parse(file, {
                 complete: (results) => {
@@ -57,10 +62,9 @@ const Data: React.FC<IDataProps> = ({ columns, rows, setRows, setColumns, setCol
                             title: header,
                             field: header,
                             hozAlign: "left" as "left", // Default alignment
-                          }));
-                        setColumns(cols);
-                        console.log(cols);
-                        setRows(parsedData);
+                        }));
+                        setCsvData(cols);
+                        setRowData(parsedData);
                     }
                 },
                 header: true // Automatically use the first row as headers
@@ -70,10 +74,12 @@ const Data: React.FC<IDataProps> = ({ columns, rows, setRows, setColumns, setCol
 
     const handleReset = () => {
         setCsvData([]);
+        setRowData([]); 
         setRows(0);
         setColumns(0);
         setColumnValues({});
         setFileName('');
+        setDisable(false);
     };
 
 
@@ -117,6 +123,7 @@ const Data: React.FC<IDataProps> = ({ columns, rows, setRows, setColumns, setCol
                     <NumberField
                         label="Columns"
                         value={columns}
+                        disabled={disable}
                         id='columns'
                         size='m'
                         placeholder='Columns'
@@ -133,6 +140,7 @@ const Data: React.FC<IDataProps> = ({ columns, rows, setRows, setColumns, setCol
                     <NumberField
                         label="Rows"
                         value={rows}
+                        disabled={disable}
                         id='rows'
                         size='m'
                         placeholder='Rows'

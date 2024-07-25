@@ -53,7 +53,7 @@ export const winFontsC = [
     "Webdings"
 ];
 
-const tableStyles: ITableStyle[] = [
+export const tableStyles: ITableStyle[] = [
     { id: 1, name: "Basic table", image: "table.png", colors: { header: "white", row: "white", stroke: "black", alt_row: "white", row_text: "black", alt_row_text: "black", header_text: "black" }, isActive: true },
     { id: 2, name: "Basic grey", image: "table_grey.png", colors: { header: "black", row: "grey", stroke: "white", alt_row: "#C8C8C8", row_text: "white", alt_row_text: "white", header_text: "white" }, isActive: false },
     { id: 3, name: "Basic blue", image: "table_blue.png", colors: { header: "#0082CB", row: "#B0C8E2", stroke: "white", alt_row: "#E3EDFC", row_text: "white", alt_row_text: "#243E84", header_text: "white" }, isActive: false },

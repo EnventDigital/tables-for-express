@@ -9,8 +9,12 @@ import Data from '../components/Data';
 import Design from '../components/Design';
 import Options from '../components/Options';
 import Tables from '../components/Table'; 
+import { ColumnDefinition } from 'react-tabulator';
 
 const AddTables: React.FC = () => {
+    const [csvData, setCsvData] = useState<ColumnDefinition[]>([]);
+    const [rowData, setRowData] = useState<any[]>([]);
+    const [disable, setDisable] = useState<boolean>(false);
     const [rows, setRows] = useState<number>(0);
     const [columns, setColumns] = useState<number>(0);
     const [columnValues, setColumnValues] = useState<{ [key: string]: string }>({});
@@ -25,10 +29,10 @@ const AddTables: React.FC = () => {
                 <Tab label="Design" value="Design"></Tab>
                 <Tab label="Options" value="Options"></Tab>
                 <TabPanel value="Design"><Design /></TabPanel>
-                <TabPanel value="Data"><Data columns={columns} rows={rows} setColumnValues={setColumnValues} setColumns={setColumns} setRows={setRows} /></TabPanel>
+                <TabPanel value="Data"><Data setCsvData={setCsvData} setRowData={setRowData} disable={disable} setDisable={setDisable} columns={columns} rows={rows} setColumnValues={setColumnValues} setColumns={setColumns} setRows={setRows} /></TabPanel>
                 <TabPanel value="Options"><Options setFontFamily={setFontFamily} setFontType={setFontType} setTextAlignment={setTextAlignment}/></TabPanel>
             </Tabs>
-            <Tables columnValues={columnValues} columns={columns} rows={rows} fontFamily={fontFamily} fontType={fontType} textAlignment={textAlignment}/>
+            <Tables csvData={csvData} rowData={rowData} disable={disable} columnValues={columnValues} columns={columns} rows={rows} fontFamily={fontFamily} fontType={fontType} textAlignment={textAlignment}/>
         </div>
     );
 }
