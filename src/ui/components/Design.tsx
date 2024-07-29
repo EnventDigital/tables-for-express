@@ -1,5 +1,9 @@
 import React from 'react';
 import { tableStyles } from '../utils/font';
+// import  '../../images/table_green.png';
+
+// console.log("icon", icon);
+
 
 
 const Design: React.FC = () => {
@@ -9,7 +13,7 @@ const Design: React.FC = () => {
                 {tableStyles.map(style => (
                     <div key={style.id} style={{ border: '1px solid #ccc', borderRadius: '5px', padding: '10px', width: '200px', textAlign: 'center' }}>
                         <h3>{style.name}</h3>
-                        <img   src={`../../images/${style.image}`}  alt={style.name} style={{ width: '100%', height: 'auto' }} />
+                        <img  src={`images/${style.image}`}  alt={style.name} style={{ width: '100%', height: 'auto' }} />
                         <button style={{ marginTop: '10px' }}>
                             {style.isActive ? 'Active' : 'Select'}
                         </button>
