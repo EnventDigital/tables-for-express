@@ -35,7 +35,7 @@ const Options: React.FC<IOptions> = ({setFontFamily, setFontType, setTextAlignme
 
     return (
         <div className='option'>
-            <div className='rows_col'>
+            {/* <div className='rows_col'>
                 <div className='row'>
                     <FieldLabel for='font-family' size="m">Font family</FieldLabel>
                     <Picker
@@ -63,8 +63,8 @@ const Options: React.FC<IOptions> = ({setFontFamily, setFontType, setTextAlignme
                         <MenuItem key={'italic'} value='italic'>Italics</MenuItem>
                     </Picker>
                 </div>
-            </div>
-            <FieldLabel for='text-alignment' size="m">Text alignment in each cell: </FieldLabel>
+            </div> */}
+            <FieldLabel for='text-alignment' size="m"  style={{marginTop: '1rem' }}>Text alignment in each cell: </FieldLabel>
             <Picker
                 key='text-alignment'
                 style={{ width: "100%", marginBottom: '1rem' }}

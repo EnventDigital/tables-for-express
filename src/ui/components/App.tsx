@@ -23,7 +23,7 @@ const App = ({ addOnUISdk, sandboxProxy }: { addOnUISdk: AddOnSDKAPI; sandboxPro
         // You may use "addOnUISdk.app.ui.theme" to get the current theme and react accordingly.
         <Theme theme="express" scale="medium" color="light">
             <div className="container">
-                <AddTables/>
+                <AddTables sandboxProxy={sandboxProxy}/>
             </div>
         </Theme>
     );

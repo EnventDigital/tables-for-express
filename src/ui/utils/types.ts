@@ -14,5 +14,6 @@ export interface ITableStyle {
     image: string;
     colors: ITableColors;
     isActive: boolean;
+    border: string
 
 }

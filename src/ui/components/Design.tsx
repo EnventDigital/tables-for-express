@@ -1,22 +1,24 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { tableStyles } from '../utils/font';
-// import  '../../images/table_green.png';
-
-// console.log("icon", icon);
+import { ITableStyle } from '../utils/types';
 
 
+type IDesignProps = {
+    setSelectedStyle:React.Dispatch<React.SetStateAction<ITableStyle>>
+}
+const Design: React.FC<IDesignProps> = ({setSelectedStyle}) => {
+    const [selectedImageId, setSelectedImageId] = useState<number | null>(null);
 
-const Design: React.FC = () => {
+    const handleImageClick = (id: number, style: ITableStyle) => {
+        setSelectedImageId(id);
+        setSelectedStyle(style)
+    };
     return (
         <div>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', justifyContent:'center', marginTop:'1rem'}}>
                 {tableStyles.map(style => (
-                    <div key={style.id} style={{ border: '1px solid #ccc', borderRadius: '5px', padding: '10px', width: '200px', textAlign: 'center' }}>
-                        <h3>{style.name}</h3>
-                        <img  src={`images/${style.image}`}  alt={style.name} style={{ width: '100%', height: 'auto' }} />
-                        <button style={{ marginTop: '10px' }}>
-                            {style.isActive ? 'Active' : 'Select'}
-                        </button>
+                    <div key={style.id} style={{padding: '5px 0px', width: '110px', textAlign: 'center' }}>
+                        <img   onClick={() => handleImageClick(style.id, style)} src={`images/${style.image}`}  alt={style.name} style={{ width: '100%', height: 'auto',  cursor: 'pointer',   border: selectedImageId === style.id &&`2px solid ${style.border}` }} />
                     </div>
                 ))}
             </div>

@@ -8,31 +8,55 @@ import '../components/App.css'
 import Data from '../components/Data';
 import Design from '../components/Design';
 import Options from '../components/Options';
-import Tables from '../components/Table'; 
+import Tables from '../components/Table';
 import { ColumnDefinition } from 'react-tabulator';
+import { ITableStyle } from '../utils/types';
+import { tableStyles } from '../utils/font';
+import { Button } from '@swc-react/button';
+import { FieldGroup } from '@swc-react/field-group';
+import { DocumentSandboxApi } from '../../models/DocumentSandboxApi';
 
-const AddTables: React.FC = () => {
+type IAdd = {
+    sandboxProxy: DocumentSandboxApi,
+}
+
+const AddTables: React.FC<IAdd> = ({ sandboxProxy }) => {
     const [csvData, setCsvData] = useState<ColumnDefinition[]>([]);
     const [rowData, setRowData] = useState<any[]>([]);
-    const [disable, setDisable] = useState<boolean>(false);
     const [rows, setRows] = useState<number>(0);
     const [columns, setColumns] = useState<number>(0);
     const [columnValues, setColumnValues] = useState<{ [key: string]: string }>({});
     const [fontFamily, setFontFamily] = useState<string>('Arial');
     const [fontType, setFontType] = useState<string>('normal');
     const [textAlignment, setTextAlignment] = useState<"left" | "center" | "right">('left');
+    const [isImport, setIsImport] = useState<boolean>(false);
+    const [selectedStyle, setSelectedStyle] = useState<ITableStyle | null>(tableStyles[0]);
+
+
+    const handleCreate = async(event: any) => {
+        sandboxProxy.createRectangle();
+    }
+    
     return (
-        <div>
+        <div className='add-table'>
             <h2>Add Table</h2>
             <Tabs compact size='m' selected='Data'>
                 <Tab label="Data" value="Data"></Tab>
                 <Tab label="Design" value="Design"></Tab>
                 <Tab label="Options" value="Options"></Tab>
-                <TabPanel value="Design"><Design /></TabPanel>
-                <TabPanel value="Data"><Data setCsvData={setCsvData} setRowData={setRowData} disable={disable} setDisable={setDisable} columns={columns} rows={rows} setColumnValues={setColumnValues} setColumns={setColumns} setRows={setRows} /></TabPanel>
-                <TabPanel value="Options"><Options setFontFamily={setFontFamily} setFontType={setFontType} setTextAlignment={setTextAlignment}/></TabPanel>
+                <TabPanel value="Design"><Design setSelectedStyle={setSelectedStyle} /></TabPanel>
+                <TabPanel value="Data"><Data textAlignment={textAlignment} isImport={isImport} setIsImport={setIsImport} setCsvData={setCsvData} setRowData={setRowData} columns={columns} rows={rows} setColumnValues={setColumnValues} setColumns={setColumns} setRows={setRows} /></TabPanel>
+                <TabPanel value="Options"><Options setFontFamily={setFontFamily} setFontType={setFontType} setTextAlignment={setTextAlignment} /></TabPanel>
             </Tabs>
-            <Tables csvData={csvData} rowData={rowData} disable={disable} columnValues={columnValues} columns={columns} rows={rows} fontFamily={fontFamily} fontType={fontType} textAlignment={textAlignment}/>
+            <Tables selectedStyle={selectedStyle} csvData={csvData} rowData={rowData} isImport={isImport} columnValues={columnValues} columns={columns} rows={rows} fontFamily={fontFamily} fontType={fontType} textAlignment={textAlignment} />
+            <div id='create'>
+                <Button variant='accent' onClick={handleCreate}>
+                    Create
+                </Button>
+                <Button variant='primary' treatment='outline'>
+                    Cancel
+                </Button>
+            </div>
         </div>
     );
 }

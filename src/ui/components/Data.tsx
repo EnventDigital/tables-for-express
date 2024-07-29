@@ -2,11 +2,12 @@ import React, { useState } from 'react';
 import { NumberField, NumberFieldType } from '@swc-react/number-field';
 import { Picker, PickerType } from '@swc-react/picker';
 import { FieldLabel, FieldLabelType } from '@swc-react/field-label';
+import { Switch } from '@swc-react/switch'
+import { FieldGroup } from '@swc-react/field-group'
 import Papa from 'papaparse';
 import {
     MenuItem
 } from '@swc-react/menu';
-
 import './App.css'
 import { Button } from '@swc-react/button';
 import { ColumnDefinition, ReactTabulator } from 'react-tabulator';
@@ -14,25 +15,20 @@ import { ColumnDefinition, ReactTabulator } from 'react-tabulator';
 
 type IDataProps = {
     columns: number,
+    textAlignment: "left" | "center" | "right",
     rows: number,
-    disable: boolean,
+    isImport:boolean,
     setRows: React.Dispatch<React.SetStateAction<number>>,
     setColumns: React.Dispatch<React.SetStateAction<number>>,
-    setDisable: React.Dispatch<React.SetStateAction<boolean>>
+    setIsImport:React.Dispatch<React.SetStateAction<boolean>>,
     setCsvData: React.Dispatch<React.SetStateAction<ColumnDefinition[]>>
     setRowData: React.Dispatch<React.SetStateAction<any[]>>
     setColumnValues: React.Dispatch<React.SetStateAction<{
         [key: string]: string;
     }>>
 }
-const Data: React.FC<IDataProps> = ({ disable, columns, rows, setRowData, setCsvData, setRows, setColumns, setColumnValues, setDisable }) => {
+const Data: React.FC<IDataProps> = ({textAlignment, isImport, columns, rows, setRowData, setCsvData, setRows, setColumns, setColumnValues, setIsImport }) => {
     const [fileName, setFileName] = useState<string>('');
-    const [isPaidUser, setIsPaidUser] = useState<boolean>(true);
-
-    /**
-     * Handles the change event for the rows input field.
-     * @param {any} event - The event object.
-     */
 
     const handleRowsChange = (event: any) => {
         setRows(Number(event.target._value));
@@ -51,14 +47,16 @@ const Data: React.FC<IDataProps> = ({ disable, columns, rows, setRowData, setCsv
             ...prevValues,
             [id]: value
         }));
-        // console.log(`ID: ${id}, Value: ${value}`);
+    };
+
+    const handleImportSwitch = (event: any) => {
+        setIsImport(event.target.checked)
     };
 
     // Handles the file change event.
     const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0];
         if (file) {
-            setDisable(true)
             setFileName(file.name);
             // Parse the csv file
             Papa.parse(file, {
@@ -70,7 +68,7 @@ const Data: React.FC<IDataProps> = ({ disable, columns, rows, setRowData, setCsv
                         const cols = headers.map((header) => ({
                             title: header,
                             field: header,
-                            hozAlign: "left" as "left", // Default alignment
+                            hozAlign: textAlignment, // Default alignment
                         }));
                         setCsvData(cols);
                         setRowData(parsedData);
@@ -83,12 +81,11 @@ const Data: React.FC<IDataProps> = ({ disable, columns, rows, setRowData, setCsv
 
     const handleReset = () => {
         setCsvData([]);
-        setRowData([]); 
+        setRowData([]);
         setRows(0);
         setColumns(0);
         setColumnValues({});
         setFileName('');
-        setDisable(false);
     };
 
 
@@ -103,7 +100,13 @@ const Data: React.FC<IDataProps> = ({ disable, columns, rows, setRowData, setCsv
 
     return (
         <div>
-            {isPaidUser && <div>
+            <FieldGroup horizontal id="horizontal" className="field-group">
+                <span className="import-label">Import</span>
+                <Switch emphasized size="l" change={(e) => handleImportSwitch(e)} id='switch'>
+                    Dummy
+                </Switch>
+            </FieldGroup>
+            {!isImport && <div>
                 <h3>Import a file</h3>
                 <div className='import'>
                     {!fileName && <p className='choose'>Choose csv file:</p>}
@@ -120,10 +123,10 @@ const Data: React.FC<IDataProps> = ({ disable, columns, rows, setRowData, setCsv
                     <label htmlFor="fileInput">
                         <Button size='m'>Import</Button>
                     </label>
-                    <Button variant='primary' style={{ marginLeft: '0.4rem' }} onClick={handleReset}>Reset</Button>
+                    <Button variant='primary' style={{ marginLeft: '0.4rem' }} onClick={handleReset}>Cancel</Button>
                 </div>
             </div>}
-            <div className='rows_col'>
+            {isImport && <div className='rows_col'>
                 <div className='column'>
                     <FieldLabel
                         for='columns'
@@ -132,7 +135,6 @@ const Data: React.FC<IDataProps> = ({ disable, columns, rows, setRowData, setCsv
                     <NumberField
                         label="Columns"
                         value={columns}
-                        disabled={disable}
                         id='columns'
                         size='m'
                         placeholder='Columns'
@@ -149,7 +151,6 @@ const Data: React.FC<IDataProps> = ({ disable, columns, rows, setRowData, setCsv
                     <NumberField
                         label="Rows"
                         value={rows}
-                        disabled={disable}
                         id='rows'
                         size='m'
                         placeholder='Rows'
@@ -158,8 +159,8 @@ const Data: React.FC<IDataProps> = ({ disable, columns, rows, setRowData, setCsv
                         change={(e) => handleRowsChange(e)}
                     />
                 </div>
-            </div>
-            <div className='rows_col wrap'>
+            </div>}
+            {isImport && <div className='rows_col wrap'>
                 {Array.from({ length: columns }).map((_, index) => (
                     <div className='columns-selection' key={index}>
                         <FieldLabel for={`Column ${index + 1}`} size="m">Column {index + 1}</FieldLabel>
@@ -173,7 +174,7 @@ const Data: React.FC<IDataProps> = ({ disable, columns, rows, setRowData, setCsv
                         </Picker>
                     </div>
                 ))}
-            </div>
+            </div>}
         </div>
     );
 }
