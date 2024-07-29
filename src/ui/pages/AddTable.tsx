@@ -30,7 +30,7 @@ const AddTables: React.FC<IAdd> = ({ sandboxProxy }) => {
     const [fontType, setFontType] = useState<string>('normal');
     const [textAlignment, setTextAlignment] = useState<"left" | "center" | "right">('left');
     const [isImport, setIsImport] = useState<boolean>(false);
-    const [selectedStyle, setSelectedStyle] = useState<ITableStyle | null>(tableStyles[0]);
+    const [selectedStyle, setSelectedStyle] = useState<ITableStyle | null>(tableStyles[7]);
 
 
     const handleCreate = async(event: any) => {
