@@ -14,9 +14,6 @@ import { AddOnSDKAPI } from "https://new.express.adobe.com/static/add-on-sdk/sdk
 import AddTables from "../pages/AddTable";
 
 const App = ({ addOnUISdk, sandboxProxy }: { addOnUISdk: AddOnSDKAPI; sandboxProxy: DocumentSandboxApi }) => {
-    function handleClick() {
-        sandboxProxy.createRectangle();
-    }
 
     return (
         // Please note that the below "<Theme>" component does not react to theme changes in Express.

@@ -32,9 +32,35 @@ const AddTables: React.FC<IAdd> = ({ sandboxProxy }) => {
     const [isImport, setIsImport] = useState<boolean>(false);
     const [selectedStyle, setSelectedStyle] = useState<ITableStyle | null>(tableStyles[7]);
 
-
+    function hexToRgba(hex: string): { red: number, green: number, blue: number, alpha: number } {
+        // Remove the leading # if present
+        hex = hex.replace(/^#/, '');
+    
+        // Parse the red, green, and blue values
+        let r = parseInt(hex.substring(0, 2), 16);
+        let g = parseInt(hex.substring(2, 4), 16);
+        let b = parseInt(hex.substring(4, 6), 16);
+    
+        // Convert to normalized values (0-1 range)
+        let red = r / 255;
+        let green = g / 255;
+        let blue = b / 255;
+    
+        // Default alpha to 1 if not provided
+        let alpha = 1;
+    
+        return { red, green, blue, alpha };
+    }
+    
     const handleCreate = async(event: any) => {
-        sandboxProxy.createRectangle();
+        const width = 800;
+        const height = 400;
+        const fill = hexToRgba(selectedStyle.colors.row);
+        const gutter = rows;
+        const columnColor = hexToRgba(selectedStyle.colors.header);
+        const rowColor = fill;
+        // sandboxProxy.createRectangle({width, height, fill});
+        sandboxProxy.createTable({columns, rows, gutter, columnColor, rowColor})
     }
     
     return (

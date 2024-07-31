@@ -54,8 +54,8 @@ export const winFontsC = [
 ];
 
 export const tableStyles: ITableStyle[] = [
-    { id: 1, name: "Basic table", image: "table.png", colors: { header: "white", row: "white", stroke: "black", alt_row: "white", row_text: "black", alt_row_text: "black", header_text: "black" }, isActive: true, border:'black' },
-    { id: 2, name: "Basic grey", image: "table_grey.png", colors: { header: "black", row: "grey", stroke: "white", alt_row: "#C8C8C8", row_text: "white", alt_row_text: "white", header_text: "white" }, isActive: false, border:'grey' },
+    { id: 1, name: "Basic table", image: "table.png", colors: { header: "white", row: "#FFFFFF", stroke: "black", alt_row: "white", row_text: "black", alt_row_text: "black", header_text: "black" }, isActive: true, border:'black' },
+    { id: 2, name: "Basic grey", image: "table_grey.png", colors: { header: "black", row: "#808080", stroke: "white", alt_row: "#C8C8C8", row_text: "white", alt_row_text: "white", header_text: "white" }, isActive: false, border:'grey' },
     { id: 3, name: "Basic blue", image: "table_blue.png", colors: { header: "#0082CB", row: "#B0C8E2", stroke: "white", alt_row: "#E3EDFC", row_text: "white", alt_row_text: "#243E84", header_text: "white" }, isActive: false, border: '#0082CB' },
     { id: 4, name: "Basic orange", image: "table_orange.png", colors: { header: "#F95E19", row: "#F9D298", stroke: "white", alt_row: "#F2E4BB", row_text: "white", alt_row_text: "#9F6B53", header_text: "white" }, isActive: false, border: '#F95E19' },
     { id: 5, name: "Basic green", image: "table_green.png", colors: { header: "#447A06", row: "#CADD7C", stroke: "white", alt_row: "#DEF2B3", row_text: "white", alt_row_text: "#3C5D16", header_text: "white" }, isActive: false, border: '#447A06' },
@@ -68,7 +68,7 @@ export const tableStyles: ITableStyle[] = [
     { id: 12, name: "Simple grey", image: "table_2_grey.png", colors: { header: "black", row: "#FFFFFF", stroke: "#000000", alt_row: "white", row_text: "black", alt_row_text: "black", header_text: "white" }, isActive: false, border: 'black' },
     { id: 13, name: "Simple blue", image: "table_2_blue.png", colors: { header: "#EEF8FF", row: "#A2D6F9", stroke: "#0082CB", alt_row: "white", row_text: "white", alt_row_text: "#0082CB", header_text: "#0082CB" }, isActive: false, border: '#0082CB' },
     { id: 14, name: "Simple orange", image: "table_2_orange.png", colors: { header: "#FFFCF0", row: "#F7CFA4", stroke: "#F95E19", alt_row: "white", row_text: "white", alt_row_text: "#683C2E", header_text: "#683C2E" }, isActive: false, border: '#F95E19' },
-    { id: 15, name: "Simple green", image: "table_2_green.png", colors: { header: "#F0FCD0", row: "white", stroke: "#447A06", alt_row: "#CADD7C", row_text: "#39462A", alt_row_text: "white", header_text: "#39462A" }, isActive: false, border: '#447A06' },
+    { id: 15, name: "Simple green", image: "table_2_green.png", colors: { header: "#F0FCD0", row: "#FFFFFF", stroke: "#447A06", alt_row: "#CADD7C", row_text: "#39462A", alt_row_text: "white", header_text: "#39462A" }, isActive: false, border: '#447A06' },
     { id: 16, name: "Simple purple", image: "table_2_purple.png", colors: { header: "#F7E4F5", row: "#FFFFFF", stroke: "#662B8C", alt_row: "#DBCAE8", row_text: "#705780", alt_row_text: "white", header_text: "#705780" }, isActive: false, border: '#662B8C' },
     { id: 17, name: "Simple brown", image: "table_2_brown.png", colors: { header: "#F4ECE4", row: "#FFFFFF", stroke: "#661F03", alt_row: "#D8C29E", row_text: "#674F46", alt_row_text: "white", header_text: "#671C00" }, isActive: false, border: '#661F03' },
     { id: 18, name: "Simple deep blue", image: "table_2_blue_2.png", colors: { header: "#0019FF", row: "#FFFFFF", stroke: "#0019FF", alt_row: "#B1C0E8", row_text: "#505BBC", alt_row_text: "white", header_text: "white" }, isActive: false, border: '#0019FF' },
