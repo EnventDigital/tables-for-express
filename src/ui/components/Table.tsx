@@ -33,29 +33,16 @@ const Tables: React.FC<ITableProps> = ({selectedStyle, rowData, isImport, csvDat
         }),
     }));
 
-    const rowDatas = Array.from({ length: rows }).map((_, rowIndex) => {
-        const row = {};
-        Array.from({ length: columns }).forEach((_, colIndex) => {
-            row[`field${colIndex + 1}`] = `Row ${rowIndex + 1} Col ${colIndex + 1}`;
-        });
-        return row;
-    });
     return (
         <div className='table-container ' id="example-table">
-           {(columnDefinitions.length > 0 || csvData.length > 0) && (
+           {(csvData.length > 0) && (
                 <ReactTabulator
-                    data={isImport ? rowDatas : rowData}
-                    columns={isImport ? columnDefinitions : csvData.map((col: any) => ({
-                        ...col,
-                        hozAlign: textAlignment,
-                        headerHozAlign: textAlignment
-                    }))}
+                    data={rowData}
+                    columns={csvData}
                     layout="fitData"
                     rowFormatter={(row) => {
                         const rowElement = row.getElement();
-                        console.log(rowElement);
                         const rowIndex = row.getPosition(true) % 2 === 0;
-                        console.log(rowIndex);
                         rowElement.style.backgroundColor = rowIndex ? selectedStyle.colors.alt_row : selectedStyle.colors.row;
                         rowElement.style.color = rowIndex ? selectedStyle.colors.alt_row_text : selectedStyle.colors.row_text;
                     }}

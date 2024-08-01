@@ -17,27 +17,64 @@ type IDataProps = {
     columns: number,
     textAlignment: "left" | "center" | "right",
     rows: number,
-    isImport:boolean,
+    isImport: boolean,
     setRows: React.Dispatch<React.SetStateAction<number>>,
     setColumns: React.Dispatch<React.SetStateAction<number>>,
-    setIsImport:React.Dispatch<React.SetStateAction<boolean>>,
+    setIsImport: React.Dispatch<React.SetStateAction<boolean>>,
+    setImported: React.Dispatch<React.SetStateAction<boolean>>,
     setCsvData: React.Dispatch<React.SetStateAction<ColumnDefinition[]>>
     setRowData: React.Dispatch<React.SetStateAction<any[]>>
     setColumnValues: React.Dispatch<React.SetStateAction<{
         [key: string]: string;
     }>>
 }
-const Data: React.FC<IDataProps> = ({textAlignment, isImport, columns, rows, setRowData, setCsvData, setRows, setColumns, setColumnValues, setIsImport }) => {
+const Data: React.FC<IDataProps> = ({ textAlignment, isImport, columns, rows, setRowData, setCsvData, setRows, setColumns, setColumnValues, setIsImport, setImported }) => {
     const [fileName, setFileName] = useState<string>('');
+
+    const columnsData:ColumnDefinition[] = [
+        { title: "Name", field: "name", width: 150 },
+        { title: "Age", field: "age", hozAlign: "left", formatter: "progress" },
+        { title: "Favourite Color", field: "col" },
+        { title: "Date Of Birth", field: "dob", hozAlign: "center" },
+        { title: "Rating", field: "rating", hozAlign: "center", formatter: "star" },
+        { title: "Passed?", field: "passed", hozAlign: "center", formatter: "tickCross" }
+    ];
+
+    const data = [
+        { id: 1, name: "Oli Bob", age: "12", col: "red", dob: "29/06/1986" },
+        { id: 2, name: "Mary May", age: "1", col: "blue", dob: "14/05/1982" },
+        { id: 3, name: "Christine Lobowski", age: "42", col: "green", dob: "22/05/1982" },
+        { id: 4, name: "Brendon Philips", age: "125", col: "orange", dob: "01/08/1980" },
+        { id: 5, name: "Margret Marmajuke", age: "16", col: "yellow", dob: "31/01/1999" },
+        { id: 1, name: "Oli Bob", age: "12", col: "red", dob: "29/06/1986" },
+        { id: 2, name: "Mary May", age: "1", col: "blue", dob: "14/05/1982" },
+        { id: 3, name: "Christine Lobowski", age: "42", col: "green", dob: "22/05/1982" },
+        { id: 4, name: "Brendon Philips", age: "125", col: "orange", dob: "01/08/1980" },
+        { id: 5, name: "Margret Marmajuke", age: "16", col: "yellow", dob: "31/01/1999" },
+        { id: 1, name: "Oli Bob", age: "12", col: "red", dob: "29/06/1986" },
+        { id: 2, name: "Mary May", age: "1", col: "blue", dob: "14/05/1982" },
+        { id: 3, name: "Christine Lobowski", age: "42", col: "green", dob: "22/05/1982" },
+        { id: 4, name: "Brendon Philips", age: "125", col: "orange", dob: "01/08/1980" },
+        { id: 5, name: "Margret Marmajuke", age: "16", col: "yellow", dob: "31/01/1999" },
+        { id: 1, name: "Oli Bob", age: "12", col: "red", dob: "29/06/1986" },
+        { id: 2, name: "Mary May", age: "1", col: "blue", dob: "14/05/1982" },
+        { id: 3, name: "Christine Lobowski", age: "42", col: "green", dob: "22/05/1982" },
+        { id: 4, name: "Brendon Philips", age: "125", col: "orange", dob: "01/08/1980" },
+        { id: 5, name: "Margret Marmajuke", age: "16", col: "yellow", dob: "31/01/1999" },
+    ];
+
 
     const handleRowsChange = (event: any) => {
         setRows(Number(event.target._value));
+        const dataWithoutId = data.map(({ id, ...rest }) => rest);
+        setRowData(dataWithoutId.slice(0, event.target._value))
     };
 
 
     // Handles the change event for the columns input field.
     const handleColumnsChange = (event: any) => {
         setColumns(Number(event.target._value));
+        setCsvData(columnsData.slice(0, event.target._value))
     };
 
     // Handles the change event for the picker component.
@@ -58,6 +95,7 @@ const Data: React.FC<IDataProps> = ({textAlignment, isImport, columns, rows, set
         const file = event.target.files?.[0];
         if (file) {
             setFileName(file.name);
+            setImported(true);
             // Parse the csv file
             Papa.parse(file, {
                 complete: (results) => {
@@ -140,6 +178,7 @@ const Data: React.FC<IDataProps> = ({textAlignment, isImport, columns, rows, set
                         placeholder='Columns'
                         style={{ width: "100%" }}
                         min={0}
+                        max={6}
                         change={(e) => handleColumnsChange(e)}
                     />
                 </div>
@@ -156,6 +195,7 @@ const Data: React.FC<IDataProps> = ({textAlignment, isImport, columns, rows, set
                         placeholder='Rows'
                         style={{ width: "100%" }}
                         min={0}
+                        max={20}
                         change={(e) => handleRowsChange(e)}
                     />
                 </div>
@@ -170,7 +210,9 @@ const Data: React.FC<IDataProps> = ({textAlignment, isImport, columns, rows, set
                             id={`Column ${index + 1}`} size="m" label="Selection type"
                             change={(e) => handlePickerChange(e)}
                         >
-                            <MenuItem>hdhdjhfdjh</MenuItem>
+                            {columnsData.map((item, itemIndex) => (
+                                <MenuItem key={itemIndex} value={item.field}>{item.title}</MenuItem>
+                            ))}
                         </Picker>
                     </div>
                 ))}

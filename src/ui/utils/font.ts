@@ -75,3 +75,23 @@ export const tableStyles: ITableStyle[] = [
     { id: 19, name: "Simple red", image: "table_2_red.png", colors: { header: "#FFE9F5", row: "#FFFFFF", stroke: "#E01414", alt_row: "#F4BFBD", row_text: "#754545", alt_row_text: "white", header_text: "#754545" }, isActive: false, border: '#E01414' },
     { id: 20, name: "Simple yellow", image: "table_2_yellow.png", colors: { header: "#FFFFEB", row: "#FFFFFF", stroke: "#FFD60B", alt_row: "#FCECAC", row_text: "#807540", alt_row_text: "#8B7505", header_text: "#807540" }, isActive: false, border: '#FFD60B' },
 ]
+
+export function hexToRgba(hex: string): { red: number, green: number, blue: number, alpha: number } {
+    // Remove the leading # if present
+    hex = hex.replace(/^#/, '');
+
+    // Parse the red, green, and blue values
+    let r = parseInt(hex.substring(0, 2), 16);
+    let g = parseInt(hex.substring(2, 4), 16);
+    let b = parseInt(hex.substring(4, 6), 16);
+
+    // Convert to normalized values (0-1 range)
+    let red = r / 255;
+    let green = g / 255;
+    let blue = b / 255;
+
+    // Default alpha to 1 if not provided
+    let alpha = 1;
+
+    return { red, green, blue, alpha };
+}
