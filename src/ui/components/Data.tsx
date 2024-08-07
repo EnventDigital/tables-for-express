@@ -11,7 +11,7 @@ import {
 import './App.css'
 import { Button } from '@swc-react/button';
 import { ColumnDefinition, ReactTabulator } from 'react-tabulator';
-
+import { da, faker } from '@faker-js/faker';
 
 type IDataProps = {
     columns: number,
@@ -31,43 +31,46 @@ type IDataProps = {
 const Data: React.FC<IDataProps> = ({ textAlignment, isImport, columns, rows, setRowData, setCsvData, setRows, setColumns, setColumnValues, setIsImport, setImported }) => {
     const [fileName, setFileName] = useState<string>('');
 
-    const columnsData:ColumnDefinition[] = [
+    console.log(faker);
+    const columnsData: ColumnDefinition[] = [
         { title: "Name", field: "name", width: 150 },
-        { title: "Age", field: "age", hozAlign: "left", formatter: "progress" },
-        { title: "Favourite Color", field: "col" },
-        { title: "Date Of Birth", field: "dob", hozAlign: "center" },
-        { title: "Rating", field: "rating", hozAlign: "center", formatter: "star" },
-        { title: "Passed?", field: "passed", hozAlign: "center", formatter: "tickCross" }
+        { title: "Address", field: "address", width: 150 },
+        { title: "Email", field: "email", width: 150 },
+        { title: "Phone", field: "phone", width: 150 },
+        { title: "Website", field: "website", width: 150 },
+        { title: "Department", field: "department", width: 150 },
+        { title: "Product", field: "product", width: 150 },
+        { title: "Price", field: "price", width: 150 },
+        { title: "Company", field: "company", width: 150 },
+        { title: "Day", field: "day", width: 150 },
+        { title: "Gender", field: "gender", width: 150 }
     ];
 
-    const data = [
-        { id: 1, name: "Oli Bob", age: "12", col: "red", dob: "29/06/1986" },
-        { id: 2, name: "Mary May", age: "1", col: "blue", dob: "14/05/1982" },
-        { id: 3, name: "Christine Lobowski", age: "42", col: "green", dob: "22/05/1982" },
-        { id: 4, name: "Brendon Philips", age: "125", col: "orange", dob: "01/08/1980" },
-        { id: 5, name: "Margret Marmajuke", age: "16", col: "yellow", dob: "31/01/1999" },
-        { id: 1, name: "Oli Bob", age: "12", col: "red", dob: "29/06/1986" },
-        { id: 2, name: "Mary May", age: "1", col: "blue", dob: "14/05/1982" },
-        { id: 3, name: "Christine Lobowski", age: "42", col: "green", dob: "22/05/1982" },
-        { id: 4, name: "Brendon Philips", age: "125", col: "orange", dob: "01/08/1980" },
-        { id: 5, name: "Margret Marmajuke", age: "16", col: "yellow", dob: "31/01/1999" },
-        { id: 1, name: "Oli Bob", age: "12", col: "red", dob: "29/06/1986" },
-        { id: 2, name: "Mary May", age: "1", col: "blue", dob: "14/05/1982" },
-        { id: 3, name: "Christine Lobowski", age: "42", col: "green", dob: "22/05/1982" },
-        { id: 4, name: "Brendon Philips", age: "125", col: "orange", dob: "01/08/1980" },
-        { id: 5, name: "Margret Marmajuke", age: "16", col: "yellow", dob: "31/01/1999" },
-        { id: 1, name: "Oli Bob", age: "12", col: "red", dob: "29/06/1986" },
-        { id: 2, name: "Mary May", age: "1", col: "blue", dob: "14/05/1982" },
-        { id: 3, name: "Christine Lobowski", age: "42", col: "green", dob: "22/05/1982" },
-        { id: 4, name: "Brendon Philips", age: "125", col: "orange", dob: "01/08/1980" },
-        { id: 5, name: "Margret Marmajuke", age: "16", col: "yellow", dob: "31/01/1999" },
-    ];
-
+    const generateData = (numRows) => {
+        const data = [];
+        for (let i = 0; i < numRows; i++) {
+            data.push({
+                name: faker.name.fullName(),
+                address: faker.address.streetAddress(),
+                email: faker.internet.email(),
+                phone: faker.phone.number(),
+                website: faker.internet.url(),
+                department: faker.commerce.department(),
+                product: faker.commerce.productName(),
+                price: faker.commerce.price(),
+                company: faker.company.name(),
+                day: faker.date.weekday(),
+                gender: faker.name.sex()
+            });
+        }
+        return data;
+    };
 
     const handleRowsChange = (event: any) => {
         setRows(Number(event.target._value));
-        const dataWithoutId = data.map(({ id, ...rest }) => rest);
-        setRowData(dataWithoutId.slice(0, event.target._value))
+        const data = generateData(Number(event.target._value));
+        console.log(data);
+        setRowData(data);
     };
 
 
@@ -107,6 +110,7 @@ const Data: React.FC<IDataProps> = ({ textAlignment, isImport, columns, rows, se
                             title: header,
                             field: header,
                             hozAlign: textAlignment, // Default alignment
+                            headerHozAlign: textAlignment,
                         }));
                         setCsvData(cols);
                         setRowData(parsedData);
@@ -178,7 +182,7 @@ const Data: React.FC<IDataProps> = ({ textAlignment, isImport, columns, rows, se
                         placeholder='Columns'
                         style={{ width: "100%" }}
                         min={0}
-                        max={6}
+                        max={11}
                         change={(e) => handleColumnsChange(e)}
                     />
                 </div>
@@ -195,27 +199,31 @@ const Data: React.FC<IDataProps> = ({ textAlignment, isImport, columns, rows, se
                         placeholder='Rows'
                         style={{ width: "100%" }}
                         min={0}
-                        max={20}
+                        // max={20}
                         change={(e) => handleRowsChange(e)}
                     />
                 </div>
             </div>}
             {isImport && <div className='rows_col wrap'>
-                {Array.from({ length: columns }).map((_, index) => (
-                    <div className='columns-selection' key={index}>
-                        <FieldLabel for={`Column ${index + 1}`} size="m">Column {index + 1}</FieldLabel>
-                        <Picker
-                            key={`Column ${index + 1}`}
-                            style={{ width: "100%", display: 'block' }}
-                            id={`Column ${index + 1}`} size="m" label="Selection type"
-                            change={(e) => handlePickerChange(e)}
-                        >
-                            {columnsData.map((item, itemIndex) => (
-                                <MenuItem key={itemIndex} value={item.field}>{item.title}</MenuItem>
-                            ))}
-                        </Picker>
+                <div style={{ width: '100%', overflowX: 'auto', scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+                    <div style={{ display: 'flex', gap: '10px', justifyContent: 'center', marginTop: '1rem', width: 'max-content', whiteSpace: 'nowrap' }}>
+                        {Array.from({ length: columns }).map((_, index) => (
+                            <div key={index} style={{ display: 'inline-block', padding: '5px 0px', textAlign: 'center' }}>
+                                <FieldLabel for={`Column ${index + 1}`} size="m">Column {index + 1}</FieldLabel>
+                                <Picker
+                                    key={`Column ${index + 1}`}
+                                    style={{ width: "100%", display: 'block' }}
+                                    id={`Column ${index + 1}`} size="m" label="Selection type"
+                                    change={(e) => handlePickerChange(e)}
+                                >
+                                    {columnsData.map((item, itemIndex) => (
+                                        <MenuItem key={itemIndex} value={item.field}>{item.title}</MenuItem>
+                                    ))}
+                                </Picker>
+                            </div>
+                        ))}
                     </div>
-                ))}
+                </div>
             </div>}
         </div>
     );

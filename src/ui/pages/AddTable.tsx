@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
     Tabs,
     Tab,
@@ -55,15 +55,15 @@ const AddTables: React.FC<IAdd> = ({ sandboxProxy }) => {
             setColumnValues(newColumnValues);
             currentColumnValues = newColumnValues;
         }
-        // console.log(rowData);
-        const gutter = rows;
+        const gutter = 6;
         sandboxProxy.createTable({ columns, rows, gutter, selectedStyle, columnValues: currentColumnValues, rowData })
     }
 
+    console.log(columnValues);
     return (
-        <div className='add-table'>
+        <div className='add-table' style={{maxWidth: '250px'}}>
             <h2>Add Table</h2>
-            <Tabs compact size='m' selected='Data'>
+            <Tabs compact size='m' selected='Data' >
                 <Tab label="Data" value="Data"></Tab>
                 <Tab label="Design" value="Design"></Tab>
                 <Tab label="Options" value="Options"></Tab>

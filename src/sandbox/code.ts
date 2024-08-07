@@ -1,5 +1,5 @@
 import addOnSandboxSdk from "add-on-sdk-document-sandbox";
-import { editor, GroupNode, RectangleNode, TextNode } from "express-document-sdk";
+import { colorUtils, editor, GroupNode, RectangleNode, TextNode } from "express-document-sdk";
 import { DocumentSandboxApi } from "../models/DocumentSandboxApi";
 import { hexToRgba } from '../ui/utils/font';
 
@@ -45,16 +45,34 @@ function start(): void {
         },
 
         createTable({ columns, rows, gutter, selectedStyle, columnValues, rowData }): void {
-            const columnColor = hexToRgba(selectedStyle.colors.header);
-            const rowColor = hexToRgba(selectedStyle.colors.row);
+            const columnColor = colorUtils.fromHex(selectedStyle.colors.header);
+            const rowColor = colorUtils.fromHex(selectedStyle.colors.row);
             const tableWidth = 1000;
             const tableHeight = 700;
-            const columnWidth = (tableWidth - (columns + 1) * gutter) / columns;
-            const rowHeight = (tableHeight - (rows + 1) * gutter) / rows;
+        
+            const effectiveTableWidth = tableWidth - ((columns + 1) * gutter);
+            const effectiveTableHeight = tableHeight - ((rows + 1) * gutter);
+        
+            // Ensure columns don't exceed available width
+            const columnWidth = Math.max(effectiveTableWidth / columns, 200); // Minimum column width of 200px
+            // Ensure rows don't exceed available height
+            const rowHeight = Math.max(effectiveTableHeight / rows, 50); // Minimum row height of 50px
+        
+            // Ensure column width and row height are not negative
+            if (columnWidth < 0 || rowHeight < 0) {
+                console.error("Invalid dimensions calculated. Please check table width, height, and gutter size.");
+                return;
+            }
+        
             const page = editor.documentRoot.pages.first;
             const tableGroup = editor.createGroup();
-    
-            
+            console.log(`Column Width: ${columnWidth}, Row Height: ${rowHeight}`);
+            // const columnWidth = (tableWidth - (columns + 1) * gutter) / columns;
+            // const rowHeight = (tableHeight - (rows + 1) * gutter) / rows;
+            // const page = editor.documentRoot.pages.first;
+            // const tableGroup = editor.createGroup();
+
+
             // Create columns
             for (let i = 0; i < columns; i++) {
                 const columnText = columnValues[`Column ${i + 1}`] || `Column ${i + 1}`;
