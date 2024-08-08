@@ -4,14 +4,14 @@ import { ITableStyle } from '../utils/types';
 
 
 type IDesignProps = {
-    setSelectedStyle: React.Dispatch<React.SetStateAction<ITableStyle>>
+    setStyle: React.Dispatch<React.SetStateAction<ITableStyle>>
 }
-const Design: React.FC<IDesignProps> = ({ setSelectedStyle }) => {
+const Design: React.FC<IDesignProps> = ({ setStyle }) => {
     const [selectedImageId, setSelectedImageId] = useState<number | null>(null);
 
     const handleImageClick = (id: number, style: ITableStyle) => {
         setSelectedImageId(id);
-        setSelectedStyle(style)
+        setStyle(style)
     };
     return (
         <div style={{ width: '100%', overflowX: 'auto', scrollbarWidth: 'none', msOverflowStyle: 'none' }}>

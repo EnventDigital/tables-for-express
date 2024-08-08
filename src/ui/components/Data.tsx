@@ -26,12 +26,11 @@ type IDataProps = {
     setRowData: React.Dispatch<React.SetStateAction<any[]>>
     setColumnValues: React.Dispatch<React.SetStateAction<{
         [key: string]: string;
-    }>>
+    }>> 
 }
 const Data: React.FC<IDataProps> = ({ textAlignment, isImport, columns, rows, setRowData, setCsvData, setRows, setColumns, setColumnValues, setIsImport, setImported }) => {
     const [fileName, setFileName] = useState<string>('');
 
-    console.log(faker);
     const columnsData: ColumnDefinition[] = [
         { title: "Name", field: "name", width: 150 },
         { title: "Address", field: "address", width: 150 },
@@ -50,8 +49,8 @@ const Data: React.FC<IDataProps> = ({ textAlignment, isImport, columns, rows, se
         const data = [];
         for (let i = 0; i < numRows; i++) {
             data.push({
-                name: faker.name.fullName(),
-                address: faker.address.streetAddress(),
+                name: faker.person.fullName(),
+                address: faker.location.streetAddress(),
                 email: faker.internet.email(),
                 phone: faker.phone.number(),
                 website: faker.internet.url(),
@@ -60,7 +59,7 @@ const Data: React.FC<IDataProps> = ({ textAlignment, isImport, columns, rows, se
                 price: faker.commerce.price(),
                 company: faker.company.name(),
                 day: faker.date.weekday(),
-                gender: faker.name.sex()
+                gender: faker.person.sex()
             });
         }
         return data;
@@ -69,8 +68,8 @@ const Data: React.FC<IDataProps> = ({ textAlignment, isImport, columns, rows, se
     const handleRowsChange = (event: any) => {
         setRows(Number(event.target._value));
         const data = generateData(Number(event.target._value));
-        console.log(data);
         setRowData(data);
+        console.log(data);
     };
 
 
@@ -128,6 +127,8 @@ const Data: React.FC<IDataProps> = ({ textAlignment, isImport, columns, rows, se
         setColumns(0);
         setColumnValues({});
         setFileName('');
+        setImported(false);
+        setIsImport(false);
     };
 
 

@@ -17,20 +17,46 @@ import { DocumentSandboxApi } from '../../models/DocumentSandboxApi';
 
 type IAdd = {
     sandboxProxy: DocumentSandboxApi,
+    rowData: any[]
+    rows: number,
+    columns: number
+    csvData: ColumnDefinition[],
+    columnValues: {
+        [key: string]: string;
+    }
+    fontFamily: string
+    fontType: string,
+    textAlignment: "left" | "center" | "right"
+    isImport: boolean,
+    imported: boolean,
+    selectedStyle: ITableStyle
+    setCsvData: React.Dispatch<React.SetStateAction<ColumnDefinition[]>>
+    setRowData: React.Dispatch<React.SetStateAction<any[]>>,
+    setRows: React.Dispatch<React.SetStateAction<number>>
+    setColumns: React.Dispatch<React.SetStateAction<number>>
+    setColumnValues: React.Dispatch<React.SetStateAction<{
+        [key: string]: string;
+    }>>
+    setFontFamily: React.Dispatch<React.SetStateAction<string>>
+    setFontType: React.Dispatch<React.SetStateAction<string>>
+    setTextAlignment: React.Dispatch<React.SetStateAction<"left" | "center" | "right">>
+    setIsImport: React.Dispatch<React.SetStateAction<boolean>>
+    setImported: React.Dispatch<React.SetStateAction<boolean>>
+    setStyle: React.Dispatch<React.SetStateAction<ITableStyle>>
 }
 
-const AddTables: React.FC<IAdd> = ({ sandboxProxy }) => {
-    const [csvData, setCsvData] = useState<ColumnDefinition[]>([]);
-    const [rowData, setRowData] = useState<any[]>([]);
-    const [rows, setRows] = useState<number>(0);
-    const [columns, setColumns] = useState<number>(0);
-    const [columnValues, setColumnValues] = useState<{ [key: string]: string }>({});
-    const [fontFamily, setFontFamily] = useState<string>('Arial');
-    const [fontType, setFontType] = useState<string>('normal');
-    const [textAlignment, setTextAlignment] = useState<"left" | "center" | "right">('left');
-    const [isImport, setIsImport] = useState<boolean>(false);
-    const [imported, setImported] = useState<boolean>(false);
-    const [selectedStyle, setSelectedStyle] = useState<ITableStyle | null>(tableStyles[7]);
+const AddTables: React.FC<IAdd> = ({ sandboxProxy,rows, rowData, columns, columnValues, csvData, textAlignment, fontFamily, fontType, isImport, imported, selectedStyle, setCsvData, setColumnValues, setColumns, setFontFamily, setFontType, setImported, setIsImport, setRowData, setRows, setStyle, setTextAlignment }) => {
+    // const [csvData, setCsvData] = useState<ColumnDefinition[]>([]);
+    // const [rowData, setRowData] = useState<any[]>([]);
+    // const [rows, setRows] = useState<number>(0);
+    // const [columns, setColumns] = useState<number>(0);
+    // const [columnValues, setColumnValues] = useState<{ [key: string]: string }>({});
+    // const [fontFamily, setFontFamily] = useState<string>('Arial');
+    // const [fontType, setFontType] = useState<string>('normal');
+    // const [textAlignment, setTextAlignment] = useState<"left" | "center" | "right">('left');
+    // const [isImport, setIsImport] = useState<boolean>(false);
+    // const [imported, setImported] = useState<boolean>(false);
+    // const [selectedStyle, setSelectedStyle] = useState<ITableStyle>(tableStyles[7]);
 
     useEffect(() => {
         if (imported && csvData.length > 0) {
@@ -59,7 +85,7 @@ const AddTables: React.FC<IAdd> = ({ sandboxProxy }) => {
         sandboxProxy.createTable({ columns, rows, gutter, selectedStyle, columnValues: currentColumnValues, rowData })
     }
 
-    console.log(columnValues);
+    console.log(rowData);
     return (
         <div className='add-table' style={{maxWidth: '250px'}}>
             <h2>Add Table</h2>
@@ -67,11 +93,11 @@ const AddTables: React.FC<IAdd> = ({ sandboxProxy }) => {
                 <Tab label="Data" value="Data"></Tab>
                 <Tab label="Design" value="Design"></Tab>
                 <Tab label="Options" value="Options"></Tab>
-                <TabPanel value="Design"><Design setSelectedStyle={setSelectedStyle} /></TabPanel>
+                <TabPanel value="Design"><Design setStyle={setStyle} /></TabPanel>
                 <TabPanel value="Data"><Data setImported={setImported} textAlignment={textAlignment} isImport={isImport} setIsImport={setIsImport} setCsvData={setCsvData} setRowData={setRowData} columns={columns} rows={rows} setColumnValues={setColumnValues} setColumns={setColumns} setRows={setRows} /></TabPanel>
                 <TabPanel value="Options"><Options setFontFamily={setFontFamily} setFontType={setFontType} setTextAlignment={setTextAlignment} /></TabPanel>
             </Tabs>
-            <Tables selectedStyle={selectedStyle} csvData={csvData} rowData={rowData} isImport={isImport} columnValues={columnValues} columns={columns} rows={rows} fontFamily={fontFamily} fontType={fontType} textAlignment={textAlignment} />
+            <Tables setCsvData={setCsvData} selectedStyle={selectedStyle} csvData={csvData} rowData={rowData} isImport={isImport} columnValues={columnValues} columns={columns} rows={rows} fontFamily={fontFamily} fontType={fontType} textAlignment={textAlignment} />
             <div id='create'>
                 <Button variant='accent' onClick={handleCreate}>
                     Create

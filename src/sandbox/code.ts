@@ -47,7 +47,7 @@ function start(): void {
         createTable({ columns, rows, gutter, selectedStyle, columnValues, rowData }): void {
             const columnColor = colorUtils.fromHex(selectedStyle.colors.header);
             const rowColor = colorUtils.fromHex(selectedStyle.colors.row);
-            const tableWidth = 1000;
+            const tableWidth = 700;
             const tableHeight = 700;
         
             const effectiveTableWidth = tableWidth - ((columns + 1) * gutter);
@@ -66,7 +66,7 @@ function start(): void {
         
             const page = editor.documentRoot.pages.first;
             const tableGroup = editor.createGroup();
-            console.log(`Column Width: ${columnWidth}, Row Height: ${rowHeight}`);
+            // console.log(`Column Width: ${columnWidth}, Row Height: ${rowHeight}`);
             // const columnWidth = (tableWidth - (columns + 1) * gutter) / columns;
             // const rowHeight = (tableHeight - (rows + 1) * gutter) / rows;
             // const page = editor.documentRoot.pages.first;
