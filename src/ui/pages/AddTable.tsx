@@ -1,9 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
-import {
-    Tabs,
-    Tab,
-    TabPanel
-} from '@swc-react/tabs';
+import '@spectrum-web-components/tabs/sp-tabs.js';
+import '@spectrum-web-components/tabs/sp-tab.js';
+import '@spectrum-web-components/tabs/sp-tab-panel.js';
 import '../components/App.css'
 import Data from '../components/Data';
 import Design from '../components/Design';
@@ -45,19 +43,7 @@ type IAdd = {
     setStyle: React.Dispatch<React.SetStateAction<ITableStyle>>
 }
 
-const AddTables: React.FC<IAdd> = ({ sandboxProxy,rows, rowData, columns, columnValues, csvData, textAlignment, fontFamily, fontType, isImport, imported, selectedStyle, setCsvData, setColumnValues, setColumns, setFontFamily, setFontType, setImported, setIsImport, setRowData, setRows, setStyle, setTextAlignment }) => {
-    // const [csvData, setCsvData] = useState<ColumnDefinition[]>([]);
-    // const [rowData, setRowData] = useState<any[]>([]);
-    // const [rows, setRows] = useState<number>(0);
-    // const [columns, setColumns] = useState<number>(0);
-    // const [columnValues, setColumnValues] = useState<{ [key: string]: string }>({});
-    // const [fontFamily, setFontFamily] = useState<string>('Arial');
-    // const [fontType, setFontType] = useState<string>('normal');
-    // const [textAlignment, setTextAlignment] = useState<"left" | "center" | "right">('left');
-    // const [isImport, setIsImport] = useState<boolean>(false);
-    // const [imported, setImported] = useState<boolean>(false);
-    // const [selectedStyle, setSelectedStyle] = useState<ITableStyle>(tableStyles[7]);
-
+const AddTables: React.FC<IAdd> = ({ sandboxProxy, rows, rowData, columns, columnValues, csvData, textAlignment, fontFamily, fontType, isImport, imported, selectedStyle, setCsvData, setColumnValues, setColumns, setFontFamily, setFontType, setImported, setIsImport, setRowData, setRows, setStyle, setTextAlignment }) => {
     useEffect(() => {
         if (imported && csvData.length > 0) {
             const newColumnValues: { [key: string]: string } = {};
@@ -87,16 +73,16 @@ const AddTables: React.FC<IAdd> = ({ sandboxProxy,rows, rowData, columns, column
 
     console.log(rowData);
     return (
-        <div className='add-table' style={{maxWidth: '250px'}}>
+        <div className='add-table' style={{ maxWidth: '250px' }}>
             <h2>Add Table</h2>
-            <Tabs compact size='m' selected='Data' >
-                <Tab label="Data" value="Data"></Tab>
-                <Tab label="Design" value="Design"></Tab>
-                <Tab label="Options" value="Options"></Tab>
-                <TabPanel value="Design"><Design setStyle={setStyle} /></TabPanel>
-                <TabPanel value="Data"><Data setImported={setImported} textAlignment={textAlignment} isImport={isImport} setIsImport={setIsImport} setCsvData={setCsvData} setRowData={setRowData} columns={columns} rows={rows} setColumnValues={setColumnValues} setColumns={setColumns} setRows={setRows} /></TabPanel>
-                <TabPanel value="Options"><Options setFontFamily={setFontFamily} setFontType={setFontType} setTextAlignment={setTextAlignment} /></TabPanel>
-            </Tabs>
+            <sp-tabs selected="Data" size="m" compact>
+                <sp-tab label="Data" value="Data"></sp-tab>
+                <sp-tab label="Design" value="Design"></sp-tab>
+                <sp-tab label="Options" value="Options"></sp-tab>
+                <sp-tab-panel value="Design"><Design setStyle={setStyle} /></sp-tab-panel>
+                <sp-tab-panel value="Data"><Data setImported={setImported} textAlignment={textAlignment} isImport={isImport} setIsImport={setIsImport} setCsvData={setCsvData} setRowData={setRowData} columns={columns} rows={rows} setColumnValues={setColumnValues} setColumns={setColumns} setRows={setRows} /></sp-tab-panel>
+                <sp-tab-panel value="Options"><Options setFontFamily={setFontFamily} setFontType={setFontType} setTextAlignment={setTextAlignment} /></sp-tab-panel>
+            </sp-tabs>
             <Tables setCsvData={setCsvData} selectedStyle={selectedStyle} csvData={csvData} rowData={rowData} isImport={isImport} columnValues={columnValues} columns={columns} rows={rows} fontFamily={fontFamily} fontType={fontType} textAlignment={textAlignment} />
             <div id='create'>
                 <Button variant='accent' onClick={handleCreate}>

@@ -16,6 +16,7 @@
     ],
     "dependencies": {
         "@faker-js/faker": "^8.4.1",
+        "@spectrum-web-components/tabs": "^0.46.0",
         "@swc-react/action-button": "^0.44.0",
         "@swc-react/button": "^0.44.0",
         "@swc-react/field-group": "^0.44.0",
