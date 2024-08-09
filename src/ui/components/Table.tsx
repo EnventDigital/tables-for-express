@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import './App.css'
 import 'react-tabulator/lib/styles.css';
 import "tabulator-tables/dist/css/tabulator.min.css";
-import { ReactTabulator, ColumnDefinition } from 'react-tabulator'
+import { ReactTabulator, ColumnDefinition, ReactTabulatorOptions } from 'react-tabulator'
 import { ITableStyle } from '../utils/types';
 import { generateData } from '../utils/font';
 
@@ -18,10 +18,10 @@ type ITableProps = {
     textAlignment: "left" | "center" | "right",
     selectedStyle: ITableStyle,
     setCsvData: React.Dispatch<React.SetStateAction<ColumnDefinition[]>>
-    setRowData:React.Dispatch<React.SetStateAction<any[]>>
+    setRowData: React.Dispatch<React.SetStateAction<any[]>>
 }
 
-const Tables: React.FC<ITableProps> = ({ selectedStyle, rowData, csvData, textAlignment, columns, rows, columnValues, setCsvData, setRowData}) => {
+const Tables: React.FC<ITableProps> = ({ selectedStyle, rowData, csvData, textAlignment, columns, rows, columnValues, setCsvData, setRowData }) => {
 
     useEffect(() => {
         const applyStyles = () => {
@@ -43,13 +43,21 @@ const Tables: React.FC<ITableProps> = ({ selectedStyle, rowData, csvData, textAl
         return () => observer.disconnect();
     }, [selectedStyle]);
 
+    const options: ReactTabulatorOptions = {
+        height: 300,
+        movableRows: true,
+        progressiveLoad: 'scroll',
+        progressiveLoadDelay: 200,
+        progressiveLoadScrollMargin: 30,
+        
+    };
     return (
         <div className='table-container fixed-height' id="example-table">
             {(csvData.length > 0) && (
                 <ReactTabulator
-                    key={JSON.stringify({ selectedStyle, textAlignment, columns, columnValues, csvData})}
+                    key={JSON.stringify({ selectedStyle, textAlignment, columns, columnValues, csvData })}
                     data={rowData}
-                     columns={csvData.map(col => ({
+                    columns={csvData.map(col => ({
                         ...col,
                         headerSort: false,
                         vertAlign: "middle",
@@ -67,6 +75,7 @@ const Tables: React.FC<ITableProps> = ({ selectedStyle, rowData, csvData, textAl
                         rowElement.style.backgroundColor = rowIndex ? selectedStyle.colors.alt_row : selectedStyle.colors.row;
                         rowElement.style.color = rowIndex ? selectedStyle.colors.alt_row_text : selectedStyle.colors.row_text;
                     }}
+                    options={options}
                 />
             )}
         </div>

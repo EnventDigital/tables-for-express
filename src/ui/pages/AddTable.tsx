@@ -46,8 +46,10 @@ type IAdd = {
 }
 
 const AddTables: React.FC<IAdd> = ({ sandboxProxy, rows, rowData, columns, columnValues, csvData, textAlignment, fontFamily, fontType, isImport, imported, selectedStyle, setCsvData, setColumnValues, setColumns, setFontFamily, setFontType, setImported, setIsImport, setRowData, setRows, setStyle, setTextAlignment }) => {
-    const [isLoading, setIsLoading] = useState(false); // Loading state
+    const [isLoading, setIsLoading] = useState<boolean>(false); // Loading state
     const [fileName, setFileName] = useState<string>('');
+    const [generated, setGenerated] = useState<boolean>(false);
+    const [errorText, setErrorText] = useState<any>(null);
 
     useEffect(() => {
         if (imported && csvData.length > 0) {
@@ -77,8 +79,11 @@ const AddTables: React.FC<IAdd> = ({ sandboxProxy, rows, rowData, columns, colum
 
         try {
             await sandboxProxy.createTable({ columns, rows, gutter, selectedStyle, columnValues: currentColumnValues, rowData });
+            setGenerated(true)
         } catch (error) {
-            console.error("Error creating table:", error);
+            setGenerated(false);
+            setErrorText(error.message)
+            // console.error("Error creating table in add:", error.message);
         } finally {
             setIsLoading(false); // Set loading state to false after the table is created
         }
@@ -98,8 +103,16 @@ const AddTables: React.FC<IAdd> = ({ sandboxProxy, rows, rowData, columns, colum
         setFontType('normal');
         setStyle(tableStyles[7]);
         setTextAlignment('left');
+        setIsLoading(false);
+        setGenerated(false);
+        setErrorText(null)
     };
 
+    const handleToastClose = () => {
+        setGenerated(false);
+        setErrorText(null);
+    }
+    
     return (
         <div className='add-table' style={{ maxWidth: '250px' }}>
             {!isLoading &&
@@ -133,6 +146,23 @@ const AddTables: React.FC<IAdd> = ({ sandboxProxy, rows, rowData, columns, colum
                     Reset
                 </Button>
             </div>
+            <Toast open={generated}
+                id='spectrum-toast'
+                style={{width: "90%", position: 'fixed', top: "80%", zIndex: 3}} 
+                variant='positive'
+                timeout={7000}
+                close={handleToastClose}
+            > 
+                Table created successfully
+            </Toast> 
+            <Toast open={errorText}
+                id='spectrum-error-toast'
+                style={{width: "90%", position: 'fixed', top: "80%", zIndex: 3}} 
+                variant='negative'
+                timeout={7000}
+            > 
+               {errorText}
+            </Toast> 
         </div>
     );
 }
