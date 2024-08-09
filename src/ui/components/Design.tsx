@@ -14,23 +14,44 @@ const Design: React.FC<IDesignProps> = ({ setStyle }) => {
         setStyle(style)
     };
     return (
-        <div style={{ width: '100%', overflowX: 'auto', scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
-            <div style={{ display: 'flex', gap: '10px', justifyContent: 'center', marginTop: '1rem', width: 'max-content', whiteSpace: 'nowrap' }}>
-                {tableStyles.map(style => (
-                    <div key={style.id} style={{ display: 'inline-block', padding: '5px 0px', textAlign: 'center' }}>
-                        <img
-                            onClick={() => handleImageClick(style.id, style)}
-                            src={`images/${style.image}`}
-                            alt={style.name}
-                            style={{
-                                width: '110px',
-                                height: 'auto',
-                                cursor: 'pointer',
-                                border: selectedImageId === style.id ? `2px solid ${style.border}` : 'none'
-                            }}
-                        />
-                    </div>
-                ))}
+        <div style={{ width: '100%', display:'block'}} >
+            <div style={{ width: '100%', overflowX: 'auto', scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+                <div style={{ display: 'flex', gap: '10px', justifyContent: 'center', marginTop: '1rem', width: 'max-content', whiteSpace: 'nowrap' }}>
+                    {tableStyles.slice(0, 10).map(style => (
+                        <div key={style.id} style={{ display: 'inline-block', padding: '5px 0px', textAlign: 'center' }}>
+                            <img
+                                onClick={() => handleImageClick(style.id, style)}
+                                src={`images/${style.image}`}
+                                alt={style.name}
+                                style={{
+                                    width: '110px',
+                                    height: 'auto',
+                                    cursor: 'pointer',
+                                    border: selectedImageId === style.id ? `2px solid ${style.border}` : 'none'
+                                }}
+                            />
+                        </div>
+                    ))}
+                </div>
+            </div>
+            <div style={{ width: '100%', overflowX: 'auto', scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+                <div style={{ display: 'flex', gap: '10px', justifyContent: 'center', marginTop: '1rem', width: 'max-content', whiteSpace: 'nowrap' }}>
+                    {tableStyles.slice(11).map(style => (
+                        <div key={style.id} style={{ display: 'inline-block', padding: '5px 0px', textAlign: 'center' }}>
+                            <img
+                                onClick={() => handleImageClick(style.id, style)}
+                                src={`images/${style.image}`}
+                                alt={style.name}
+                                style={{
+                                    width: '110px',
+                                    height: 'auto',
+                                    cursor: 'pointer',
+                                    border: selectedImageId === style.id ? `2px solid ${style.border}` : 'none'
+                                }}
+                            />
+                        </div>
+                    ))}
+                </div>
             </div>
         </div>
     );

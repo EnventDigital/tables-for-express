@@ -4,6 +4,7 @@ import 'react-tabulator/lib/styles.css';
 import "tabulator-tables/dist/css/tabulator.min.css";
 import { ReactTabulator, ColumnDefinition } from 'react-tabulator'
 import { ITableStyle } from '../utils/types';
+import { generateData } from '../utils/font';
 
 type ITableProps = {
     columns?: number,
@@ -17,9 +18,10 @@ type ITableProps = {
     textAlignment: "left" | "center" | "right",
     selectedStyle: ITableStyle,
     setCsvData: React.Dispatch<React.SetStateAction<ColumnDefinition[]>>
+    setRowData:React.Dispatch<React.SetStateAction<any[]>>
 }
 
-const Tables: React.FC<ITableProps> = ({ selectedStyle, rowData, csvData, textAlignment, columns, rows, columnValues, setCsvData}) => {
+const Tables: React.FC<ITableProps> = ({ selectedStyle, rowData, csvData, textAlignment, columns, rows, columnValues, setCsvData, setRowData}) => {
 
     useEffect(() => {
         const applyStyles = () => {
@@ -41,26 +43,11 @@ const Tables: React.FC<ITableProps> = ({ selectedStyle, rowData, csvData, textAl
         return () => observer.disconnect();
     }, [selectedStyle]);
 
-    useEffect(() => {
-        setCsvData(prevCsvData => {
-            const mappedColumns = prevCsvData.map((col, index) => {
-                const mappedField = columnValues[`Column ${index + 1}`] || col.field;
-                return {
-                    ...col,
-                    field: mappedField,
-                    title: mappedField.charAt(0).toUpperCase() + mappedField.slice(1),
-                };
-            });
-
-            return mappedColumns;
-        });
-    }, [columnValues, setCsvData]);
-
     return (
         <div className='table-container fixed-height' id="example-table">
             {(csvData.length > 0) && (
                 <ReactTabulator
-                    key={JSON.stringify({ selectedStyle, textAlignment, columns, rows, columnValues, csvData })}
+                    key={JSON.stringify({ selectedStyle, textAlignment, columns, columnValues, csvData})}
                     data={rowData}
                      columns={csvData.map(col => ({
                         ...col,

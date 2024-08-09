@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { NumberField, NumberFieldType } from '@swc-react/number-field';
 import { Picker, PickerType } from '@swc-react/picker';
 import { FieldLabel, FieldLabelType } from '@swc-react/field-label';
@@ -10,14 +10,18 @@ import {
 } from '@swc-react/menu';
 import './App.css'
 import { Button } from '@swc-react/button';
-import { ColumnDefinition, ReactTabulator } from 'react-tabulator';
-import { da, faker } from '@faker-js/faker';
+import { ColumnDefinition } from 'react-tabulator';
+import { generateData } from '../utils/font';
 
 type IDataProps = {
     columns: number,
     textAlignment: "left" | "center" | "right",
     rows: number,
     isImport: boolean,
+    columnValues: {
+        [key: string]: string;
+    }
+    fileName: string
     setRows: React.Dispatch<React.SetStateAction<number>>,
     setColumns: React.Dispatch<React.SetStateAction<number>>,
     setIsImport: React.Dispatch<React.SetStateAction<boolean>>,
@@ -26,10 +30,10 @@ type IDataProps = {
     setRowData: React.Dispatch<React.SetStateAction<any[]>>
     setColumnValues: React.Dispatch<React.SetStateAction<{
         [key: string]: string;
-    }>> 
+    }>>
+    setFileName: React.Dispatch<React.SetStateAction<string>>
 }
-const Data: React.FC<IDataProps> = ({ textAlignment, isImport, columns, rows, setRowData, setCsvData, setRows, setColumns, setColumnValues, setIsImport, setImported }) => {
-    const [fileName, setFileName] = useState<string>('');
+const Data: React.FC<IDataProps> = ({ fileName, textAlignment, isImport, columns, rows, columnValues, setRowData, setCsvData, setRows, setColumns, setColumnValues, setIsImport, setImported, setFileName }) => {
 
     const columnsData: ColumnDefinition[] = [
         { title: "Name", field: "name", width: 150 },
@@ -45,31 +49,10 @@ const Data: React.FC<IDataProps> = ({ textAlignment, isImport, columns, rows, se
         { title: "Gender", field: "gender", width: 150 }
     ];
 
-    const generateData = (numRows) => {
-        const data = [];
-        for (let i = 0; i < numRows; i++) {
-            data.push({
-                name: faker.person.fullName(),
-                address: faker.location.streetAddress(),
-                email: faker.internet.email(),
-                phone: faker.phone.number(),
-                website: faker.internet.url(),
-                department: faker.commerce.department(),
-                product: faker.commerce.productName(),
-                price: faker.commerce.price(),
-                company: faker.company.name(),
-                day: faker.date.weekday(),
-                gender: faker.person.sex()
-            });
-        }
-        return data;
-    };
-
     const handleRowsChange = (event: any) => {
         setRows(Number(event.target._value));
         const data = generateData(Number(event.target._value));
         setRowData(data);
-        console.log(data);
     };
 
 
@@ -79,13 +62,41 @@ const Data: React.FC<IDataProps> = ({ textAlignment, isImport, columns, rows, se
         setCsvData(columnsData.slice(0, event.target._value))
     };
 
-    // Handles the change event for the picker component.
     const handlePickerChange = (event: any) => {
         const { id, value } = event.target;
-        setColumnValues(prevValues => ({
-            ...prevValues,
+
+        // Update column values
+        const updatedColumnValues = {
+            ...columnValues,
             [id]: value
-        }));
+        };
+
+        setColumnValues(updatedColumnValues);
+
+        setCsvData(prevCsvData => {
+            const mappedColumns = prevCsvData.map((col, index) => {
+                const columnId = `Column ${index + 1}`;
+
+                const mappedField = updatedColumnValues[columnId] || col.field;
+
+                return {
+                    ...col,
+                    field: mappedField,
+                    title: mappedField.charAt(0).toUpperCase() + mappedField.slice(1),
+                };
+            });
+
+            // Generate data that aligns with the updated columns
+            const data = generateData(rows).map(item => {
+                let newRow = {};
+                mappedColumns.forEach(col => {
+                    newRow[col.field] = item[col.field];
+                });
+                return newRow;
+            });
+            setRowData(data);
+            return mappedColumns;
+        });
     };
 
     const handleImportSwitch = (event: any) => {
@@ -120,18 +131,6 @@ const Data: React.FC<IDataProps> = ({ textAlignment, isImport, columns, rows, se
         }
     };
 
-    const handleReset = () => {
-        setCsvData([]);
-        setRowData([]);
-        setRows(0);
-        setColumns(0);
-        setColumnValues({});
-        setFileName('');
-        setImported(false);
-        setIsImport(false);
-    };
-
-
     const truncateFileName = (name: string, maxLength: number) => {
         if (name.length <= maxLength) {
             return name;
@@ -145,15 +144,16 @@ const Data: React.FC<IDataProps> = ({ textAlignment, isImport, columns, rows, se
         <div>
             <FieldGroup horizontal id="horizontal" className="field-group">
                 <span className="import-label">Import</span>
-                <Switch emphasized size="l" change={(e) => handleImportSwitch(e)} id='switch'>
+                <Switch emphasized size="l" change={(e) => handleImportSwitch(e)} id='switch' checked={isImport}>
                     Dummy
                 </Switch>
-            </FieldGroup>
+            </FieldGroup> 
             {!isImport && <div>
-                <h3>Import a file</h3>
                 <div className='import'>
                     {!fileName && <p className='choose'>Choose csv file:</p>}
-                    {fileName && <p className='selected-file'>Selected file: <span>{truncateFileName(fileName, 13)}</span></p>}
+                    {fileName && <h3 className='selected-file'>Selected file: <span>{truncateFileName(fileName, 13)}</span></h3>}
+                </div>
+                <div>
                     <input
                         type="file"
                         accept=".csv"
@@ -164,9 +164,8 @@ const Data: React.FC<IDataProps> = ({ textAlignment, isImport, columns, rows, se
                         multiple={false}
                     />
                     <label htmlFor="fileInput">
-                        <Button size='m'>Import</Button>
+                        <Button size='m' treatment='outline' variant='secondary'>Import</Button>
                     </label>
-                    <Button variant='primary' style={{ marginLeft: '0.4rem' }} onClick={handleReset}>Cancel</Button>
                 </div>
             </div>}
             {isImport && <div className='rows_col'>

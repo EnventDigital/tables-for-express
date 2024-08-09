@@ -11,7 +11,9 @@ import { ColumnDefinition } from 'react-tabulator';
 import { ITableStyle } from '../utils/types';
 import { tableStyles } from '../utils/font';
 import { Button } from '@swc-react/button';
+import { ProgressCircle, ProgressCircleType } from '@swc-react/progress-circle';
 import { DocumentSandboxApi } from '../../models/DocumentSandboxApi';
+import { Toast, ToastType } from "@swc-react/toast";
 
 type IAdd = {
     sandboxProxy: DocumentSandboxApi,
@@ -44,6 +46,9 @@ type IAdd = {
 }
 
 const AddTables: React.FC<IAdd> = ({ sandboxProxy, rows, rowData, columns, columnValues, csvData, textAlignment, fontFamily, fontType, isImport, imported, selectedStyle, setCsvData, setColumnValues, setColumns, setFontFamily, setFontType, setImported, setIsImport, setRowData, setRows, setStyle, setTextAlignment }) => {
+    const [isLoading, setIsLoading] = useState(false); // Loading state
+    const [fileName, setFileName] = useState<string>('');
+
     useEffect(() => {
         if (imported && csvData.length > 0) {
             const newColumnValues: { [key: string]: string } = {};
@@ -57,6 +62,7 @@ const AddTables: React.FC<IAdd> = ({ sandboxProxy, rows, rowData, columns, colum
     }, [csvData, rowData, isImport]);
 
     const handleCreate = async (event: any) => {
+        setIsLoading(true); // Set loading state to true
         let currentColumnValues = columnValues;
 
         if (!imported && csvData.length > 0) {
@@ -68,28 +74,63 @@ const AddTables: React.FC<IAdd> = ({ sandboxProxy, rows, rowData, columns, colum
             currentColumnValues = newColumnValues;
         }
         const gutter = 6;
-        sandboxProxy.createTable({ columns, rows, gutter, selectedStyle, columnValues: currentColumnValues, rowData })
+
+        try {
+            await sandboxProxy.createTable({ columns, rows, gutter, selectedStyle, columnValues: currentColumnValues, rowData });
+        } catch (error) {
+            console.error("Error creating table:", error);
+        } finally {
+            setIsLoading(false); // Set loading state to false after the table is created
+        }
     }
 
-    console.log(rowData);
+    const handleReset = () => {
+        setCsvData([]);
+        setRowData([]);
+        setRows(0);
+        setColumns(0);
+        setColumnValues({});
+        setFileName('');
+        setImported(false);
+        setIsImport(false);
+        setIsLoading(false);
+        setFontFamily('Arial');
+        setFontType('normal');
+        setStyle(tableStyles[7]);
+        setTextAlignment('left');
+    };
+
     return (
         <div className='add-table' style={{ maxWidth: '250px' }}>
-            <h2>Add Table</h2>
-            <sp-tabs selected="Data" size="m" compact style={{height: "250px"}}>
-                <sp-tab label="Data" value="Data"></sp-tab>
-                <sp-tab label="Design" value="Design"></sp-tab>
-                <sp-tab label="Options" value="Options"></sp-tab>
-                <sp-tab-panel value="Design"><Design setStyle={setStyle} /></sp-tab-panel>
-                <sp-tab-panel value="Data"><Data setImported={setImported} textAlignment={textAlignment} isImport={isImport} setIsImport={setIsImport} setCsvData={setCsvData} setRowData={setRowData} columns={columns} rows={rows} setColumnValues={setColumnValues} setColumns={setColumns} setRows={setRows} /></sp-tab-panel>
-                <sp-tab-panel value="Options"><Options setFontFamily={setFontFamily} setFontType={setFontType} setTextAlignment={setTextAlignment} /></sp-tab-panel>
-            </sp-tabs>
-            <Tables setCsvData={setCsvData} selectedStyle={selectedStyle} csvData={csvData} rowData={rowData} isImport={isImport} columnValues={columnValues} columns={columns} rows={rows} fontFamily={fontFamily} fontType={fontType} textAlignment={textAlignment} />
+            {!isLoading &&
+                <>
+                    <h2>Add Table</h2>
+                    <sp-tabs selected="Data" size="m" compact  style={{ height: isImport ? "250px" : "200px" }}>
+                        <sp-tab label="Data" value="Data"></sp-tab>
+                        <sp-tab label="Design" value="Design"></sp-tab>
+                        <sp-tab label="Options" value="Options"></sp-tab>
+                        <sp-tab-panel value="Design"><Design setStyle={setStyle} /></sp-tab-panel>
+                        <sp-tab-panel value="Data"><Data fileName={fileName} setFileName={setFileName} columnValues={columnValues} setImported={setImported} textAlignment={textAlignment} isImport={isImport} setIsImport={setIsImport} setCsvData={setCsvData} setRowData={setRowData} columns={columns} rows={rows} setColumnValues={setColumnValues} setColumns={setColumns} setRows={setRows} /></sp-tab-panel>
+                        <sp-tab-panel value="Options"><Options setFontFamily={setFontFamily} setFontType={setFontType} setTextAlignment={setTextAlignment} /></sp-tab-panel>
+                    </sp-tabs>
+                    <Tables setRowData={setRowData} setCsvData={setCsvData} selectedStyle={selectedStyle} csvData={csvData} rowData={rowData} isImport={isImport} columnValues={columnValues} columns={columns} rows={rows} fontFamily={fontFamily} fontType={fontType} textAlignment={textAlignment} />
+                </>
+            }
+            {isLoading &&
+                <div style={{ display: 'flex', width: '100%', height: '100vh', justifyContent: 'center', alignItems: 'center' }}>
+                    <ProgressCircle
+                        label="creating table"
+                        indeterminate
+                        size="l"
+                    />
+                </div>
+            }
             <div id='create'>
                 <Button variant='accent' onClick={handleCreate}>
                     Create
                 </Button>
-                <Button variant='primary' treatment='outline'>
-                    Cancel
+                <Button variant='primary' treatment='outline' onClick={handleReset}>
+                    Reset
                 </Button>
             </div>
         </div>

@@ -21,8 +21,6 @@ const Options: React.FC<IOptions> = ({setFontFamily, setFontType, setTextAlignme
     ];
     
     const handleFontChange = (event: any) => {
-        // console.log(event);
-        event.preventDefault()
         const { id, value } = event.target;
         if (id === 'font-family') {
             setFontFamily(value);

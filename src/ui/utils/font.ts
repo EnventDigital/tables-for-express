@@ -1,3 +1,4 @@
+import { faker } from "@faker-js/faker";
 import { ITableStyle } from "./types";
 
 export const winFontsC = [
@@ -95,3 +96,23 @@ export function hexToRgba(hex: string): { red: number, green: number, blue: numb
 
     return { red, green, blue, alpha };
 }
+
+export const generateData = (numRows) => {
+    const data = [];
+    for (let i = 0; i < numRows; i++) {
+        data.push({
+            name: faker.person.fullName(),
+            address: faker.location.streetAddress(),
+            email: faker.internet.email(),
+            phone: faker.phone.number(),
+            website: faker.internet.url(),
+            department: faker.commerce.department(),
+            product: faker.commerce.productName(),
+            price: faker.commerce.price(),
+            company: faker.company.name(),
+            day: faker.date.weekday(),
+            gender: faker.person.sex()
+        });
+    }
+    return data;
+};
