@@ -44,7 +44,7 @@ function start(): void {
                     for (let j = 0; j < words[i].length; j++) {
                         part += words[i][j];
                         if (sandboxApi.calculateTextWidth(part + '-') > width) {
-                            wrappedText += part.slice(0, -1) + '-\n';
+                            wrappedText += part.slice(0, -1) + '\n';
                             words[i] = words[i].slice(j);
                             part = '';
                             j = -1;
@@ -142,7 +142,7 @@ function start(): void {
                 const rowColor = isEvenRow ? hexToRgba(selectedStyle.colors.alt_row) : color;
 
                 for (let i = 0; i < columns; i++) {
-                    const cellTextContent = rowValues[i] || '';
+                    const cellTextContent = rowValues[i] || `Row ${rowIndex + 1}, Col ${i + 1}`;
                     const cellRect = sandboxApi.createRectangle({
                         width: columnWidth,
                         height: rowHeight,
@@ -193,7 +193,7 @@ function start(): void {
                 const tableGroup = editor.createGroup();
 
                 for (let i = 0; i < columns; i++) {
-                    const columnText = columnValues[`Column ${i + 1}`] || ' ';
+                    const columnText = columnValues[`Column ${i + 1}`] || `Column ${i + 1}`;
                     const columnGroup = sandboxApi.createColumn({
                         columnIndex: i,
                         columnWidth,
