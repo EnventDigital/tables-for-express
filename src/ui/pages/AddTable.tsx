@@ -78,7 +78,7 @@ const AddTables: React.FC<IAdd> = ({ sandboxProxy, rows, rowData, columns, colum
         const gutter = 6;
 
         try {
-            await sandboxProxy.createTable({ columns, rows, gutter, selectedStyle, columnValues: currentColumnValues, rowData });
+            await sandboxProxy.createTable({ columns, rows, gutter, selectedStyle, columnValues: currentColumnValues, rowData, textAlignment });
             setGenerated(true)
         } catch (error) {
             setGenerated(false);
@@ -112,13 +112,13 @@ const AddTables: React.FC<IAdd> = ({ sandboxProxy, rows, rowData, columns, colum
         setGenerated(false);
         setErrorText(null);
     }
-    
+
     return (
         <div className='add-table' style={{ maxWidth: '250px' }}>
             {!isLoading &&
                 <>
                     <h2>Add Table</h2>
-                    <sp-tabs selected="Data" size="m" compact  style={{ height: isImport ? "250px" : "200px" }}>
+                    <sp-tabs selected="Data" size="m" compact style={{ height: isImport ? "250px" : "200px" }}>
                         <sp-tab label="Data" value="Data"></sp-tab>
                         <sp-tab label="Design" value="Design"></sp-tab>
                         <sp-tab label="Options" value="Options"></sp-tab>
@@ -148,21 +148,21 @@ const AddTables: React.FC<IAdd> = ({ sandboxProxy, rows, rowData, columns, colum
             </div>
             <Toast open={generated}
                 id='spectrum-toast'
-                style={{width: "90%", position: 'fixed', top: "80%", zIndex: 3}} 
+                style={{ width: "90%", position: 'fixed', top: "80%", zIndex: 3 }}
                 variant='positive'
                 timeout={7000}
                 close={handleToastClose}
-            > 
+            >
                 Table created successfully
-            </Toast> 
+            </Toast>
             <Toast open={errorText}
                 id='spectrum-error-toast'
-                style={{width: "90%", position: 'fixed', top: "80%", zIndex: 3}} 
+                style={{ width: "90%", position: 'fixed', top: "80%", zIndex: 3 }}
                 variant='negative'
                 timeout={7000}
-            > 
-               {errorText}
-            </Toast> 
+            >
+                {errorText}
+            </Toast>
         </div>
     );
 }

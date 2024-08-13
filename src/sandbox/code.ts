@@ -7,7 +7,57 @@ const { runtime } = addOnSandboxSdk.instance;
 
 function start(): void {
     const sandboxApi: DocumentSandboxApi = {
-        createRectangle({ width, height, color, x, y, textContent }): GroupNode | null {
+        calculateTextWidth(text) {
+            // Create a temporary TextNode to measure the text width
+            const tempText = editor.createText();
+            tempText.text = text;
+
+            // Get the width of the text's bounding box
+            const textWidth = tempText.boundsLocal.width;
+
+            // Clean up by removing the temporary node
+            tempText.removeFromParent();
+
+            return textWidth;
+        },
+
+        wrapText({ textContent, width, textWidth }) {
+            let words = textContent.split(' ');
+            let wrappedText = '';
+            let line = '';
+        
+            for (let i = 0; i < words.length; i++) {
+                let testLine = line + words[i] + ' ';
+                let testWidth = sandboxApi.calculateTextWidth(testLine);
+        
+                // If the testLine exceeds the width, wrap the line
+                if (testWidth > width && line !== '') {
+                    wrappedText += line.trim() + '\n';
+                    line = words[i] + ' ';
+                } else {
+                    line = testLine;
+                }
+        
+                // Handle long words (e.g., URLs) that exceed the width
+                while (sandboxApi.calculateTextWidth(line.trim()) > width) {
+                    let part = '';
+                    for (let j = 0; j < words[i].length; j++) {
+                        part += words[i][j];
+                        if (sandboxApi.calculateTextWidth(part + '-') > width) {
+                            wrappedText += part.slice(0, -1) + '-\n';
+                            words[i] = words[i].slice(j);
+                            part = '';
+                            j = -1;
+                        }
+                    }
+                    line = words[i] + ' ';
+                }
+            }
+        
+            return wrappedText + line.trim();
+        },
+        createRectangle({ width, height, color, x, y, textContent, textAlignment }): GroupNode | null {
+            const padding = 10
             try {
                 if (width <= 0 || height <= 0) {
                     throw new Error("Invalid rectangle dimensions.");
@@ -20,8 +70,30 @@ function start(): void {
                 rect.fill = editor.makeColorFill(color);
 
                 const text = editor.createText();
-                text.text = String(textContent);
-                text.translation = { x: x + width / 2, y: y + height / 2 };
+                const stringified = String(textContent);
+                text.text = stringified;
+                const textWidth = text.boundsLocal.width
+
+                if (textWidth  > width - 2 * padding) {
+                    text.text = sandboxApi.wrapText({ textContent: stringified,  width: width - 2 * padding, textWidth });
+                }
+
+                // Set text alignment
+                switch (textAlignment) {
+                    case 'left':
+                        text.textAlignment = 1; // left alignment
+                        text.translation = { x: x + padding, y: y + height / 2 }; 
+                        break;
+                    case 'right':
+                        text.textAlignment = 2; // right alignment
+                        text.translation = { x: x + width - padding, y: y + height / 2 };
+                        break;
+                    case 'center':
+                    default:
+                        text.textAlignment = 3; // center alignment
+                        text.translation = { x: x + width / 2, y: y + height / 2 }; // center translation
+                        break;
+                }
 
                 const cellGroup = editor.createGroup();
                 cellGroup.children.append(rect, text);
@@ -29,12 +101,11 @@ function start(): void {
                 return cellGroup;
             } catch (error) {
                 console.error("Error creating rectangle:", error.message);
-                // return null
                 throw error;
             }
         },
 
-        createColumn({ columnIndex, columnWidth, rowHeight, gutter, color, textContent }): GroupNode | null {
+        createColumn({ columnIndex, columnWidth, rowHeight, gutter, color, textContent, textAlignment }): GroupNode | null {
             try {
                 if (columnWidth <= 0 || rowHeight <= 0) {
                     throw new Error("Invalid column dimensions.");
@@ -43,7 +114,7 @@ function start(): void {
                 const x = gutter + (gutter + columnWidth) * columnIndex;
                 const columnGroup = editor.createGroup();
 
-                const headerRect = sandboxApi.createRectangle({ width: columnWidth, height: rowHeight, color, x, y: gutter, textContent });
+                const headerRect = sandboxApi.createRectangle({ width: columnWidth, height: rowHeight, color, x, y: gutter, textContent, textAlignment });
                 if (headerRect) {
                     columnGroup.children.append(headerRect);
                 } else {
@@ -58,7 +129,7 @@ function start(): void {
             }
         },
 
-        createRow({ rowIndex, columns, columnWidth, rowHeight, gutter, color, rowValues, selectedStyle }): GroupNode | null {
+        createRow({ rowIndex, columns, columnWidth, rowHeight, gutter, color, rowValues, selectedStyle, textAlignment }): GroupNode | null {
             try {
                 if (columns <= 0 || columnWidth <= 0 || rowHeight <= 0) {
                     throw new Error("Invalid row dimensions or column count.");
@@ -71,14 +142,15 @@ function start(): void {
                 const rowColor = isEvenRow ? hexToRgba(selectedStyle.colors.alt_row) : color;
 
                 for (let i = 0; i < columns; i++) {
-                    const cellTextContent = rowValues[i] || `Row ${rowIndex + 1}, Col ${i + 1}`;
+                    const cellTextContent = rowValues[i] || '';
                     const cellRect = sandboxApi.createRectangle({
                         width: columnWidth,
                         height: rowHeight,
                         color: rowColor,
                         x: gutter + (gutter + columnWidth) * i,
                         y,
-                        textContent: cellTextContent
+                        textContent: cellTextContent,
+                        textAlignment
                     });
                     if (cellRect) {
                         rowGroup.children.append(cellRect);
@@ -95,7 +167,7 @@ function start(): void {
             }
         },
 
-        createTable({ columns, rows, gutter, selectedStyle, columnValues, rowData }): void {
+        createTable({ columns, rows, gutter, selectedStyle, columnValues, rowData, textAlignment }): void {
             try {
                 if (columns <= 0 || rows <= 0) {
                     throw new Error("Table must have at least one column and one row.");
@@ -121,14 +193,15 @@ function start(): void {
                 const tableGroup = editor.createGroup();
 
                 for (let i = 0; i < columns; i++) {
-                    const columnText = columnValues[`Column ${i + 1}`] || `Column ${i + 1}`;
+                    const columnText = columnValues[`Column ${i + 1}`] || ' ';
                     const columnGroup = sandboxApi.createColumn({
                         columnIndex: i,
                         columnWidth,
                         rowHeight,
                         gutter,
                         color: columnColor,
-                        textContent: columnText
+                        textContent: columnText,
+                        textAlignment
                     });
                     if (columnGroup) {
                         tableGroup.children.append(columnGroup);
@@ -147,7 +220,8 @@ function start(): void {
                         gutter,
                         color: rowColor,
                         rowValues,
-                        selectedStyle
+                        selectedStyle,
+                        textAlignment
                     });
                     if (rowGroup) {
                         tableGroup.children.append(rowGroup);
