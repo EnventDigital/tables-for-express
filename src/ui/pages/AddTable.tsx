@@ -75,7 +75,7 @@ const AddTables: React.FC<IAdd> = ({ sandboxProxy, rows, rowData, columns, colum
             setColumnValues(newColumnValues);
             currentColumnValues = newColumnValues;
         }
-        const gutter = 6;
+        const gutter = 4;
 
         try {
             await sandboxProxy.createTable({ columns, rows, gutter, selectedStyle, columnValues: currentColumnValues, rowData, textAlignment });

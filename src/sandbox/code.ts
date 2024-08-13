@@ -56,7 +56,7 @@ function start(): void {
         
             return wrappedText + line.trim();
         },
-        createRectangle({ width, height, color, x, y, textContent, textAlignment }): GroupNode | null {
+        createRectangle({ width, height, color, x, y, textContent, textAlignment, strokeColor, strokeWidth}): GroupNode | null {
             const padding = 10
             try {
                 if (width <= 0 || height <= 0) {
@@ -68,6 +68,11 @@ function start(): void {
                 rect.height = height;
                 rect.translation = { x, y };
                 rect.fill = editor.makeColorFill(color);
+                const stroke = editor.makeStroke({
+                    color: colorUtils.fromHex(strokeColor),
+                    width: strokeWidth,
+                });
+                rect.stroke = stroke
 
                 const text = editor.createText();
                 const stringified = String(textContent);
@@ -105,7 +110,7 @@ function start(): void {
             }
         },
 
-        createColumn({ columnIndex, columnWidth, rowHeight, gutter, color, textContent, textAlignment }): GroupNode | null {
+        createColumn({ columnIndex, columnWidth, rowHeight, gutter, color, textContent, textAlignment, strokeColor, strokeWidth }): GroupNode | null {
             try {
                 if (columnWidth <= 0 || rowHeight <= 0) {
                     throw new Error("Invalid column dimensions.");
@@ -114,7 +119,7 @@ function start(): void {
                 const x = gutter + (gutter + columnWidth) * columnIndex;
                 const columnGroup = editor.createGroup();
 
-                const headerRect = sandboxApi.createRectangle({ width: columnWidth, height: rowHeight, color, x, y: gutter, textContent, textAlignment });
+                const headerRect = sandboxApi.createRectangle({ width: columnWidth, height: rowHeight, color, x, y: gutter, textContent, textAlignment, strokeColor,strokeWidth });
                 if (headerRect) {
                     columnGroup.children.append(headerRect);
                 } else {
@@ -129,7 +134,7 @@ function start(): void {
             }
         },
 
-        createRow({ rowIndex, columns, columnWidth, rowHeight, gutter, color, rowValues, selectedStyle, textAlignment }): GroupNode | null {
+        createRow({ rowIndex, columns, columnWidth, rowHeight, gutter, color, rowValues, selectedStyle, textAlignment, strokeColor, strokeWidth }): GroupNode | null {
             try {
                 if (columns <= 0 || columnWidth <= 0 || rowHeight <= 0) {
                     throw new Error("Invalid row dimensions or column count.");
@@ -150,7 +155,9 @@ function start(): void {
                         x: gutter + (gutter + columnWidth) * i,
                         y,
                         textContent: cellTextContent,
-                        textAlignment
+                        textAlignment,
+                        strokeColor,
+                        strokeWidth
                     });
                     if (cellRect) {
                         rowGroup.children.append(cellRect);
@@ -191,6 +198,7 @@ function start(): void {
 
                 const page = editor.documentRoot.pages.first;
                 const tableGroup = editor.createGroup();
+                const strokeWidth = Math.max(1, Math.min(columnWidth * 0.015, 5)); // 2% of column width, capped at 5px
 
                 for (let i = 0; i < columns; i++) {
                     const columnText = columnValues[`Column ${i + 1}`] || `Column ${i + 1}`;
@@ -201,7 +209,9 @@ function start(): void {
                         gutter,
                         color: columnColor,
                         textContent: columnText,
-                        textAlignment
+                        textAlignment,
+                        strokeColor: selectedStyle.colors.stroke,
+                        strokeWidth
                     });
                     if (columnGroup) {
                         tableGroup.children.append(columnGroup);
@@ -221,7 +231,9 @@ function start(): void {
                         color: rowColor,
                         rowValues,
                         selectedStyle,
-                        textAlignment
+                        textAlignment,
+                        strokeColor: selectedStyle.colors.stroke,
+                        strokeWidth
                     });
                     if (rowGroup) {
                         tableGroup.children.append(rowGroup);
