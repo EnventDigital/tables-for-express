@@ -34,7 +34,7 @@ const Design: React.FC<IDesignProps> = ({ setStyle }) => {
                     ))}
                 </div>
             </div>
-            <div style={{ width: '100%', overflowX: 'auto', scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+            <div style={{ width: '100%', overflowX: 'auto' }}>
                 <div style={{ display: 'flex', gap: '10px', justifyContent: 'center', marginTop: '1rem', width: 'max-content', whiteSpace: 'nowrap' }}>
                     {tableStyles.slice(11).map(style => (
                         <div key={style.id} style={{ display: 'inline-block', padding: '5px 0px', textAlign: 'center' }}>

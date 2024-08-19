@@ -25,11 +25,11 @@ function start(): void {
             let words = textContent.split(' ');
             let wrappedText = '';
             let line = '';
-        
+
             for (let i = 0; i < words.length; i++) {
                 let testLine = line + words[i] + ' ';
                 let testWidth = sandboxApi.calculateTextWidth(testLine);
-        
+
                 // If the testLine exceeds the width, wrap the line
                 if (testWidth > width && line !== '') {
                     wrappedText += line.trim() + '\n';
@@ -37,7 +37,7 @@ function start(): void {
                 } else {
                     line = testLine;
                 }
-        
+
                 // Handle long words (e.g., URLs) that exceed the width
                 while (sandboxApi.calculateTextWidth(line.trim()) > width) {
                     let part = '';
@@ -53,10 +53,10 @@ function start(): void {
                     line = words[i] + ' ';
                 }
             }
-        
+
             return wrappedText + line.trim();
         },
-        createRectangle({ width, height, color, x, y, textContent, textAlignment, strokeColor, strokeWidth}): GroupNode | null {
+        createRectangle({ width, height, color, x, y, textContent, textAlignment, strokeColor, strokeWidth }): GroupNode | null {
             const padding = 10
             try {
                 if (width <= 0 || height <= 0) {
@@ -79,15 +79,15 @@ function start(): void {
                 text.text = stringified;
                 const textWidth = text.boundsLocal.width
 
-                if (textWidth  > width - 2 * padding) {
-                    text.text = sandboxApi.wrapText({ textContent: stringified,  width: width - 2 * padding, textWidth });
+                if (textWidth > width - 2 * padding) {
+                    text.text = sandboxApi.wrapText({ textContent: stringified, width: width - 2 * padding, textWidth });
                 }
 
                 // Set text alignment
                 switch (textAlignment) {
                     case 'left':
                         text.textAlignment = 1; // left alignment
-                        text.translation = { x: x + padding, y: y + height / 2 }; 
+                        text.translation = { x: x + padding, y: y + height / 2 };
                         break;
                     case 'right':
                         text.textAlignment = 2; // right alignment
@@ -119,7 +119,7 @@ function start(): void {
                 const x = gutter + (gutter + columnWidth) * columnIndex;
                 const columnGroup = editor.createGroup();
 
-                const headerRect = sandboxApi.createRectangle({ width: columnWidth, height: rowHeight, color, x, y: gutter, textContent, textAlignment, strokeColor,strokeWidth });
+                const headerRect = sandboxApi.createRectangle({ width: columnWidth, height: rowHeight, color, x, y: gutter, textContent, textAlignment, strokeColor, strokeWidth });
                 if (headerRect) {
                     columnGroup.children.append(headerRect);
                 } else {
@@ -241,6 +241,18 @@ function start(): void {
                         throw new Error(`Failed to create row ${i + 1}.`);
                     }
                 }
+
+                const editorWidth = editor.documentRoot.pages.first.width;
+                const actualTableWidth = tableGroup.boundsLocal.width
+                console.log("editor",editorWidth);
+                console.log('actual', actualTableWidth);
+                
+                if (actualTableWidth > editorWidth) {
+                    const scaleFactor = editorWidth / actualTableWidth;
+                    console.log('scale', scaleFactor);
+                    // tableGroup.
+                }
+
 
                 page.artboards.first.children.append(tableGroup);
                 tableGroup.locked = true;
