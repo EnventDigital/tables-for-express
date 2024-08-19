@@ -196,7 +196,7 @@ function start(): void {
                     throw new Error("Invalid table dimensions: Width or height is too small.");
                 }
 
-                const page = editor.documentRoot.pages.first;
+                const page = editor.context.currentPage;
                 const tableGroup = editor.createGroup();
                 const strokeWidth = Math.max(1, Math.min(columnWidth * 0.015, 5)); // 2% of column width, capped at 5px
 
@@ -242,7 +242,7 @@ function start(): void {
                     }
                 }
 
-                const editorWidth = editor.documentRoot.pages.first.width;
+                const editorWidth = editor.context.currentPage.width;
                 const actualTableWidth = tableGroup.boundsLocal.width
                 console.log("editor",editorWidth);
                 console.log('actual', actualTableWidth);
