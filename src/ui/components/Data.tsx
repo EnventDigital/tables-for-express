@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from 'react';
-import { NumberField, NumberFieldType } from '@swc-react/number-field';
-import { Picker, PickerType } from '@swc-react/picker';
-import { FieldLabel, FieldLabelType } from '@swc-react/field-label';
+import React from 'react';
+import { NumberField } from '@swc-react/number-field';
+import { Picker} from '@swc-react/picker';
+import { FieldLabel} from '@swc-react/field-label';
 import { Switch } from '@swc-react/switch'
 import { FieldGroup } from '@swc-react/field-group'
 import Papa from 'papaparse';
@@ -36,17 +36,17 @@ type IDataProps = {
 const Data: React.FC<IDataProps> = ({ fileName, textAlignment, isImport, columns, rows, columnValues, setRowData, setCsvData, setRows, setColumns, setColumnValues, setIsImport, setImported, setFileName }) => {
 
     const columnsData: ColumnDefinition[] = [
-        { title: "Name", field: "name", width: 150 },
-        { title: "Address", field: "address", width: 150 },
-        { title: "Email", field: "email", width: 150 },
-        { title: "Phone", field: "phone", width: 150 },
-        { title: "Website", field: "website", width: 150 },
-        { title: "Department", field: "department", width: 150 },
-        { title: "Product", field: "product", width: 150 },
-        { title: "Price", field: "price", width: 150 },
-        { title: "Company", field: "company", width: 150 },
-        { title: "Day", field: "day", width: 150 },
-        { title: "Gender", field: "gender", width: 150 }
+        { title: "Name", field: "Name", width: 150 },
+        { title: "Address", field: "Address", width: 150 },
+        { title: "Email", field: "Email", width: 150 },
+        { title: "Phone", field: "Phone", width: 150 },
+        { title: "Website", field: "Website", width: 150 },
+        { title: "Department", field: "Department", width: 150 },
+        { title: "Product", field: "Product", width: 150 },
+        { title: "Price", field: "Price", width: 150 },
+        { title: "Company", field: "Company", width: 150 },
+        { title: "Day", field: "Day", width: 150 },
+        { title: "Gender", field: "Gender", width: 150 }
     ];
 
     const handleRowsChange = (event: any) => {
@@ -58,8 +58,17 @@ const Data: React.FC<IDataProps> = ({ fileName, textAlignment, isImport, columns
 
     // Handles the change event for the columns input field.
     const handleColumnsChange = (event: any) => {
+        const col = Number(event.target._value);
         setColumns(Number(event.target._value));
         setCsvData(columnsData.slice(0, event.target._value))
+
+        
+        const initialColumnValues = Array.from({ length:  col}).reduce((acc, _, index) => {
+            acc[`Column ${index + 1}`] = columnsData[index]?.field || "";
+            return acc;
+        }, {} as { [key: string]: string });
+
+        setColumnValues(initialColumnValues as { [key: string]: string });
     };
 
     const handlePickerChange = (event: any) => {
@@ -101,6 +110,11 @@ const Data: React.FC<IDataProps> = ({ fileName, textAlignment, isImport, columns
 
     const handleImportSwitch = (event: any) => {
         setIsImport(event.target.checked)
+        setCsvData([]);
+        setRowData([]);
+        setColumnValues({});
+        setRows(0);
+        setColumns(0);
     };
 
     // Handles the file change event.
@@ -214,6 +228,7 @@ const Data: React.FC<IDataProps> = ({ fileName, textAlignment, isImport, columns
                                     key={`Column ${index + 1}`}
                                     style={{ width: "100%", display: 'block' }}
                                     id={`Column ${index + 1}`} size="m" label="Selection type"
+                                    value={columnValues[`Column ${index + 1}`] || ""}
                                     change={(e) => handlePickerChange(e)}
                                 >
                                     {columnsData.map((item, itemIndex) => (

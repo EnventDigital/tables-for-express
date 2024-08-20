@@ -72,11 +72,10 @@ const AddTables: React.FC<IAdd> = ({ sandboxProxy, rows, rowData, columns, colum
             csvData.forEach((col, index) => {
                 newColumnValues[`Column ${index + 1}`] = col.title;
             });
-            setColumnValues(newColumnValues);
             currentColumnValues = newColumnValues;
         }
         const gutter = 4;
-
+        
         try {
             await sandboxProxy.createTable({ columns, rows, gutter, selectedStyle, columnValues: currentColumnValues, rowData, textAlignment });
             setGenerated(true)
@@ -88,7 +87,7 @@ const AddTables: React.FC<IAdd> = ({ sandboxProxy, rows, rowData, columns, colum
             setIsLoading(false); // Set loading state to false after the table is created
         }
     }
-
+    
     const handleReset = () => {
         setCsvData([]);
         setRowData([]);
@@ -103,7 +102,7 @@ const AddTables: React.FC<IAdd> = ({ sandboxProxy, rows, rowData, columns, colum
         setFontType('normal');
         setStyle(tableStyles[7]);
         setTextAlignment('left');
-        setIsLoading(false);
+        // setIsLoading(false);
         setGenerated(false);
         setErrorText(null)
     };
@@ -124,7 +123,7 @@ const AddTables: React.FC<IAdd> = ({ sandboxProxy, rows, rowData, columns, colum
                         <sp-tab label="Options" value="Options"></sp-tab>
                         <sp-tab-panel value="Design"><Design setStyle={setStyle} /></sp-tab-panel>
                         <sp-tab-panel value="Data"><Data fileName={fileName} setFileName={setFileName} columnValues={columnValues} setImported={setImported} textAlignment={textAlignment} isImport={isImport} setIsImport={setIsImport} setCsvData={setCsvData} setRowData={setRowData} columns={columns} rows={rows} setColumnValues={setColumnValues} setColumns={setColumns} setRows={setRows} /></sp-tab-panel>
-                        <sp-tab-panel value="Options"><Options setFontFamily={setFontFamily} setFontType={setFontType} setTextAlignment={setTextAlignment} /></sp-tab-panel>
+                        <sp-tab-panel value="Options"><Options setFontFamily={setFontFamily} setFontType={setFontType} setTextAlignment={setTextAlignment} textAlignment={textAlignment}  /></sp-tab-panel>
                     </sp-tabs>
                     <Tables setRowData={setRowData} setCsvData={setCsvData} selectedStyle={selectedStyle} csvData={csvData} rowData={rowData} isImport={isImport} columnValues={columnValues} columns={columns} rows={rows} fontFamily={fontFamily} fontType={fontType} textAlignment={textAlignment} />
                 </>

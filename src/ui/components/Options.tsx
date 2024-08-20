@@ -11,9 +11,10 @@ type IOptions={
     setFontFamily:React.Dispatch<React.SetStateAction<string>>,
     setFontType:React.Dispatch<React.SetStateAction<string>>,
     setTextAlignment:React.Dispatch<React.SetStateAction<string>>
+    textAlignment: "left" | "right" | "center"
 }
 
-const Options: React.FC<IOptions> = ({setFontFamily, setFontType, setTextAlignment}) => {
+const Options: React.FC<IOptions> = ({textAlignment, setFontFamily, setFontType, setTextAlignment}) => {
     const position = [
         { key: 'left', value: 'left' },
         { key: 'right', value: 'right' },
@@ -68,6 +69,7 @@ const Options: React.FC<IOptions> = ({setFontFamily, setFontType, setTextAlignme
                 style={{ width: "100%", marginBottom: '1rem' }}
                 id='text-alignment' size="m" label="Selection type" placeholder='Text alignment'
                 change={(e) => handleFontChange(e)}
+                value= {textAlignment}
             >
                 {position.map((item, itemIndex) => (
                     <MenuItem key={item.key} value={item.value}>{item.value}</MenuItem>

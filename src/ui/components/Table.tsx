@@ -1,10 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import './App.css'
 import 'react-tabulator/lib/styles.css';
 import "tabulator-tables/dist/css/tabulator.min.css";
 import { ReactTabulator, ColumnDefinition, ReactTabulatorOptions } from 'react-tabulator'
 import { ITableStyle } from '../utils/types';
-import { generateData } from '../utils/font';
 
 type ITableProps = {
     columns?: number,
@@ -21,7 +20,7 @@ type ITableProps = {
     setRowData: React.Dispatch<React.SetStateAction<any[]>>
 }
 
-const Tables: React.FC<ITableProps> = ({ selectedStyle, rowData, csvData, textAlignment, columns, rows, columnValues, setCsvData, setRowData }) => {
+const Tables: React.FC<ITableProps> = ({ selectedStyle, rowData, csvData, textAlignment, columns, columnValues }) => {
 
     useEffect(() => {
         const applyStyles = () => {
