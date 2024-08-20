@@ -189,7 +189,7 @@ function start(): void {
                 const effectiveTableWidth = tableWidth - ((columns + 1) * gutter);
                 const effectiveTableHeight = tableHeight - ((rows + 1) * gutter);
 
-                const columnWidth = Math.max(effectiveTableWidth / columns, 210);
+                const columnWidth = Math.max(effectiveTableWidth / columns, 150);
                 const rowHeight = Math.max(effectiveTableHeight / rows, 70);
 
                 if (columnWidth < 0 || rowHeight < 0) {
@@ -249,8 +249,16 @@ function start(): void {
                 
                 if (actualTableWidth > editorWidth) {
                     const scaleFactor = editorWidth / actualTableWidth;
-                    console.log('scale', scaleFactor);
-                    // tableGroup.
+                    const transformMatrix = tableGroup.transformMatrix;
+                    console.log("matrix", transformMatrix);
+    
+                    // Apply scaling to the transform matrix
+                    transformMatrix[0] *= scaleFactor;  // Scale X axis
+                    transformMatrix[3] *= scaleFactor;  // Scale Y axis (keep proportional)
+                    console.log("new matrix ", transformMatrix);
+                    
+                    // Update the group's transform matrix
+                    // tableGroup.transformMatrix = transformMatrix;
                 }
 
 

@@ -11,9 +11,9 @@ import { ColumnDefinition } from 'react-tabulator';
 import { ITableStyle } from '../utils/types';
 import { tableStyles } from '../utils/font';
 import { Button } from '@swc-react/button';
-import { ProgressCircle, ProgressCircleType } from '@swc-react/progress-circle';
+import { ProgressCircle } from '@swc-react/progress-circle';
 import { DocumentSandboxApi } from '../../models/DocumentSandboxApi';
-import { Toast, ToastType } from "@swc-react/toast";
+import { Toast } from "@swc-react/toast";
 
 type IAdd = {
     sandboxProxy: DocumentSandboxApi,
@@ -74,7 +74,7 @@ const AddTables: React.FC<IAdd> = ({ sandboxProxy, rows, rowData, columns, colum
             });
             currentColumnValues = newColumnValues;
         }
-        const gutter = 4;
+        const gutter = 0;
         
         try {
             await sandboxProxy.createTable({ columns, rows, gutter, selectedStyle, columnValues: currentColumnValues, rowData, textAlignment });
