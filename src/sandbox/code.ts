@@ -175,33 +175,133 @@ function start(): void {
         },
 
         createTable({ columns, rows, gutter, selectedStyle, columnValues, rowData, textAlignment }): void {
+            // try {
+            //     if (columns <= 0 || rows <= 0) {
+            //         throw new Error("Table must have at least one column and one row.");
+            //     }
+
+            //     const columnColor = colorUtils.fromHex(selectedStyle.colors.header);
+            //     const rowColor = colorUtils.fromHex(selectedStyle.colors.row);
+
+            //     const tableWidth = 700;
+            //     const tableHeight = 200;
+
+            //     const effectiveTableWidth = tableWidth - ((columns + 1) * gutter);
+            //     const effectiveTableHeight = tableHeight - ((rows + 1) * gutter);
+
+            //     const columnWidth = Math.max(effectiveTableWidth / columns, 150);
+            //     const rowHeight = Math.max(effectiveTableHeight / rows, 70);
+
+            //     if (columnWidth < 0 || rowHeight < 0) {
+            //         throw new Error("Invalid table dimensions: Width or height is too small.");
+            //     }
+
+            //     const page = editor.context.currentPage;
+            //     const tableGroup = editor.createGroup();
+            //     const strokeWidth = Math.max(1, Math.min(columnWidth * 0.015, 5)); // 2% of column width, capped at 5px
+
+            //     for (let i = 0; i < columns; i++) {
+            //         const columnText = columnValues[`Column ${i + 1}`] || `Column ${i + 1}`;
+            //         const columnGroup = sandboxApi.createColumn({
+            //             columnIndex: i,
+            //             columnWidth,
+            //             rowHeight,
+            //             gutter,
+            //             color: columnColor,
+            //             textContent: columnText,
+            //             textAlignment,
+            //             strokeColor: selectedStyle.colors.stroke,
+            //             strokeWidth
+            //         });
+            //         if (columnGroup) {
+            //             tableGroup.children.append(columnGroup);
+            //         } else {
+            //             throw new Error(`Failed to create column ${i + 1}.`);
+            //         }
+            //     }
+
+            //     for (let i = 0; i < rows; i++) {
+            //         const rowValues = Object.values(rowData[i] || {});
+            //         const rowGroup = sandboxApi.createRow({
+            //             rowIndex: i,
+            //             columns,
+            //             columnWidth,
+            //             rowHeight,
+            //             gutter,
+            //             color: rowColor,
+            //             rowValues,
+            //             selectedStyle,
+            //             textAlignment,
+            //             strokeColor: selectedStyle.colors.stroke,
+            //             strokeWidth
+            //         });
+            //         if (rowGroup) {
+            //             tableGroup.children.append(rowGroup);
+            //         } else {
+            //             throw new Error(`Failed to create row ${i + 1}.`);
+            //         }
+            //     }
+
+            //     const editorWidth = editor.context.currentPage.width;
+            //     const actualTableWidth = tableGroup.boundsLocal.width
+            //     console.log("editor",editorWidth);
+            //     console.log('actual', actualTableWidth);
+                
+            //     if (actualTableWidth > editorWidth) {
+            //         const scaleFactor = editorWidth / actualTableWidth;
+            //         const transformMatrix = tableGroup.transformMatrix;
+            //         console.log("matrix", transformMatrix);
+    
+            //         // Apply scaling to the transform matrix
+            //         transformMatrix[0] *= scaleFactor;  // Scale X axis
+            //         transformMatrix[3] *= scaleFactor;  // Scale Y axis (keep proportional)
+            //         console.log("new matrix ", transformMatrix);
+                    
+            //         // Update the group's transform matrix
+            //         // tableGroup.transformMatrix = transformMatrix;
+            //     }
+
+
+            //     page.artboards.first.children.append(tableGroup);
+            //     tableGroup.locked = true;
+            // } catch (error) {
+            //     console.error("Error creating table:", error.message);
+            //     throw error
+            // }
+
             try {
                 if (columns <= 0 || rows <= 0) {
                     throw new Error("Table must have at least one column and one row.");
                 }
-
+        
                 const columnColor = colorUtils.fromHex(selectedStyle.colors.header);
                 const rowColor = colorUtils.fromHex(selectedStyle.colors.row);
-
-                const tableWidth = 700;
+        
+                const minWidth = 150; // Minimum width for a column
+                const maxWidth = 250; // Maximum width for a column
+        
                 const tableHeight = 200;
-
-                const effectiveTableWidth = tableWidth - ((columns + 1) * gutter);
-                const effectiveTableHeight = tableHeight - ((rows + 1) * gutter);
-
-                const columnWidth = Math.max(effectiveTableWidth / columns, 150);
-                const rowHeight = Math.max(effectiveTableHeight / rows, 70);
-
-                if (columnWidth < 0 || rowHeight < 0) {
-                    throw new Error("Invalid table dimensions: Width or height is too small.");
+                const effectiveTableHeight = tableHeight / rows;
+                const rowHeight = Math.max(effectiveTableHeight, 70);
+        
+                if (rowHeight < 0) {
+                    throw new Error("Invalid table dimensions: Height is too small.");
                 }
-
+        
                 const page = editor.context.currentPage;
                 const tableGroup = editor.createGroup();
-                const strokeWidth = Math.max(1, Math.min(columnWidth * 0.015, 5)); // 2% of column width, capped at 5px
-
+                const strokeWidth = Math.max(1, Math.min(minWidth * 0.015, 5)); // 2% of column width, capped at 5px
+        
+                let totalTableWidth = 0;
+        
                 for (let i = 0; i < columns; i++) {
                     const columnText = columnValues[`Column ${i + 1}`] || `Column ${i + 1}`;
+                    let textWidth = sandboxApi.calculateTextWidth(columnText);
+        
+                    // Ensure column width is between minWidth and maxWidth
+                    const columnWidth = Math.min(Math.max(textWidth, minWidth), maxWidth);
+                    totalTableWidth += columnWidth;
+        
                     const columnGroup = sandboxApi.createColumn({
                         columnIndex: i,
                         columnWidth,
@@ -213,19 +313,20 @@ function start(): void {
                         strokeColor: selectedStyle.colors.stroke,
                         strokeWidth
                     });
+        
                     if (columnGroup) {
                         tableGroup.children.append(columnGroup);
                     } else {
                         throw new Error(`Failed to create column ${i + 1}.`);
                     }
                 }
-
+        
                 for (let i = 0; i < rows; i++) {
                     const rowValues = Object.values(rowData[i] || {});
                     const rowGroup = sandboxApi.createRow({
                         rowIndex: i,
                         columns,
-                        columnWidth,
+                        columnWidth: Math.min(Math.max(totalTableWidth / columns, minWidth), maxWidth),
                         rowHeight,
                         gutter,
                         color: rowColor,
@@ -235,38 +336,34 @@ function start(): void {
                         strokeColor: selectedStyle.colors.stroke,
                         strokeWidth
                     });
+        
                     if (rowGroup) {
                         tableGroup.children.append(rowGroup);
                     } else {
                         throw new Error(`Failed to create row ${i + 1}.`);
                     }
                 }
-
+        
                 const editorWidth = editor.context.currentPage.width;
-                const actualTableWidth = tableGroup.boundsLocal.width
-                console.log("editor",editorWidth);
-                console.log('actual', actualTableWidth);
+                const actualTableWidth = tableGroup.boundsLocal.width;
                 
                 if (actualTableWidth > editorWidth) {
                     const scaleFactor = editorWidth / actualTableWidth;
                     const transformMatrix = tableGroup.transformMatrix;
-                    console.log("matrix", transformMatrix);
-    
+        
                     // Apply scaling to the transform matrix
                     transformMatrix[0] *= scaleFactor;  // Scale X axis
                     transformMatrix[3] *= scaleFactor;  // Scale Y axis (keep proportional)
-                    console.log("new matrix ", transformMatrix);
                     
                     // Update the group's transform matrix
                     // tableGroup.transformMatrix = transformMatrix;
                 }
-
-
+        
                 page.artboards.first.children.append(tableGroup);
                 tableGroup.locked = true;
             } catch (error) {
                 console.error("Error creating table:", error.message);
-                throw error
+                throw error;
             }
         }
     }
