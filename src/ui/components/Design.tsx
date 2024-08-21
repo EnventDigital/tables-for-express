@@ -1,6 +1,16 @@
 import React, { useState } from 'react';
 import { tableStyles } from '../utils/font';
 import { ITableStyle } from '../utils/types';
+import { Swiper, SwiperSlide } from 'swiper/react';
+import { FreeMode, Navigation, Thumbs } from 'swiper/modules';
+
+
+// Import Swiper styles
+import 'swiper/css';
+import 'swiper/css/navigation';
+import 'swiper/css/pagination';
+import 'swiper/css/scrollbar';
+
 
 
 type IDesignProps = {
@@ -14,10 +24,15 @@ const Design: React.FC<IDesignProps> = ({ setStyle }) => {
         setStyle(style)
     };
     return (
-        <div style={{ width: '100%', display:'block'}} >
-            <div style={{ width: '100%', overflowX: 'auto', scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
-                <div style={{ display: 'flex', gap: '10px', justifyContent: 'center', marginTop: '1rem', width: 'max-content', whiteSpace: 'nowrap' }}>
-                    {tableStyles.slice(0, 10).map(style => (
+        <div style={{ width: '100%', display: 'block', marginTop: '1rem'}} >
+            <Swiper
+                modules={[FreeMode, Navigation, Thumbs]}
+                slidesPerView={2}
+                navigation={true}
+                allowTouchMove={false}
+            >
+                {tableStyles.map(style => (
+                    <SwiperSlide>
                         <div key={style.id} style={{ display: 'inline-block', padding: '5px 0px', textAlign: 'center' }}>
                             <img
                                 onClick={() => handleImageClick(style.id, style)}
@@ -31,12 +46,17 @@ const Design: React.FC<IDesignProps> = ({ setStyle }) => {
                                 }}
                             />
                         </div>
-                    ))}
-                </div>
-            </div>
-            <div style={{ width: '100%', overflowX: 'auto' }}>
-                <div style={{ display: 'flex', gap: '10px', justifyContent: 'center', marginTop: '1rem', width: 'max-content', whiteSpace: 'nowrap' }}>
-                    {tableStyles.slice(11).map(style => (
+                    </SwiperSlide>
+                ))}
+            </Swiper>
+            {/* <Swiper
+                modules={[FreeMode, Navigation, Thumbs]}
+                slidesPerView={2}
+                navigation={true}
+                allowTouchMove={false}
+            >
+                {tableStyles.slice(11).map(style => (
+                    <SwiperSlide>
                         <div key={style.id} style={{ display: 'inline-block', padding: '5px 0px', textAlign: 'center' }}>
                             <img
                                 onClick={() => handleImageClick(style.id, style)}
@@ -50,9 +70,9 @@ const Design: React.FC<IDesignProps> = ({ setStyle }) => {
                                 }}
                             />
                         </div>
-                    ))}
-                </div>
-            </div>
+                    </SwiperSlide>
+                ))}
+            </Swiper> */}
         </div>
     );
 }

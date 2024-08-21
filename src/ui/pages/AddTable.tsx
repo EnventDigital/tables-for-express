@@ -117,7 +117,7 @@ const AddTables: React.FC<IAdd> = ({ sandboxProxy, rows, rowData, columns, colum
             {!isLoading &&
                 <>
                     <h2>Add Table</h2>
-                    <sp-tabs selected="Data" size="m" compact style={{ height: isImport ? "250px" : "200px" }}>
+                    <sp-tabs selected="Data" size="m" compact style={{ height: isImport ? "250px" : "150px" }}>
                         <sp-tab label="Data" value="Data"></sp-tab>
                         <sp-tab label="Design" value="Design"></sp-tab>
                         <sp-tab label="Options" value="Options"></sp-tab>
