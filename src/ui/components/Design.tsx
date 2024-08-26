@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { tableStyles } from '../utils/font';
 import { ITableStyle } from '../utils/types';
 import { Swiper, SwiperSlide } from 'swiper/react';
-import { FreeMode, Navigation, Thumbs } from 'swiper/modules';
+import { FreeMode, Navigation, Scrollbar, Thumbs } from 'swiper/modules';
 
 
 // Import Swiper styles
@@ -26,10 +26,11 @@ const Design: React.FC<IDesignProps> = ({ setStyle }) => {
     return (
         <div style={{ width: '100%', display: 'block', marginTop: '1rem'}} >
             <Swiper
-                modules={[FreeMode, Navigation, Thumbs]}
+                modules={[FreeMode, Navigation, Thumbs, Scrollbar]}
                 slidesPerView={2}
                 navigation={true}
-                allowTouchMove={false}
+                allowTouchMove={true}
+                scrollbar={{ draggable: true }}
             >
                 {tableStyles.map(style => (
                     <SwiperSlide>
@@ -49,30 +50,6 @@ const Design: React.FC<IDesignProps> = ({ setStyle }) => {
                     </SwiperSlide>
                 ))}
             </Swiper>
-            {/* <Swiper
-                modules={[FreeMode, Navigation, Thumbs]}
-                slidesPerView={2}
-                navigation={true}
-                allowTouchMove={false}
-            >
-                {tableStyles.slice(11).map(style => (
-                    <SwiperSlide>
-                        <div key={style.id} style={{ display: 'inline-block', padding: '5px 0px', textAlign: 'center' }}>
-                            <img
-                                onClick={() => handleImageClick(style.id, style)}
-                                src={`images/${style.image}`}
-                                alt={style.name}
-                                style={{
-                                    width: '110px',
-                                    height: 'auto',
-                                    cursor: 'pointer',
-                                    border: selectedImageId === style.id ? `2px solid ${style.border}` : 'none'
-                                }}
-                            />
-                        </div>
-                    </SwiperSlide>
-                ))}
-            </Swiper> */}
         </div>
     );
 }

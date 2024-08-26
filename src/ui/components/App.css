@@ -118,3 +118,7 @@ body::-webkit-scrollbar {
 .swiper-button-next:after {
     content: 'next' !important;
 }
+
+.tabulator {
+    background-color: white !important;
+}
