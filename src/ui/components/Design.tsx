@@ -27,7 +27,7 @@ const Design: React.FC<IDesignProps> = ({ setStyle }) => {
         <div style={{ width: '100%', display: 'block', marginTop: '1rem'}} >
             <Swiper
                 modules={[FreeMode, Navigation, Thumbs, Scrollbar]}
-                slidesPerView={2}
+                slidesPerView={3}
                 navigation={true}
                 allowTouchMove={true}
                 scrollbar={{ draggable: true }}
@@ -40,7 +40,7 @@ const Design: React.FC<IDesignProps> = ({ setStyle }) => {
                                 src={`images/${style.image}`}
                                 alt={style.name}
                                 style={{
-                                    width: '110px',
+                                    width:  '75px',
                                     height: 'auto',
                                     cursor: 'pointer',
                                     border: selectedImageId === style.id ? `2px solid ${style.border}` : 'none'
