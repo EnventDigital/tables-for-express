@@ -63,9 +63,29 @@ const AddTables: React.FC<IAdd> = ({ sandboxProxy, rows, rowData, columns, colum
         }
     }, [csvData, rowData, isImport]);
 
+    /**
+     * Handles the creation of a table with the specified properties.
+     * 
+     * @param event - The event object triggering the table creation
+     * 
+     * @remarks
+     * This function manages the table creation process by:
+     * - Setting loading state during creation
+     * - Handling imported CSV data if present
+     * - Creating column values based on CSV data or existing values
+     * - Sending table creation request to sandboxProxy
+     * - Managing success/error states
+     * 
+     * @throws Will propagate any errors from the sandboxProxy.createTable call
+     * 
+     * @param {any} event - The event object (TODO: specify exact event type)
+     * @returns {Promise<void>}
+     */
     const handleCreate = async (event: any) => {
         setIsLoading(true); // Set loading state to true
         let currentColumnValues = columnValues;
+
+        
 
         if (!imported && csvData.length > 0) {
             const newColumnValues: { [key: string]: string } = {};
@@ -75,6 +95,17 @@ const AddTables: React.FC<IAdd> = ({ sandboxProxy, rows, rowData, columns, colum
             currentColumnValues = newColumnValues;
         }
         const gutter = 0;
+        console.log('columnValues', columnValues);
+        console.log('currentColumnValues', currentColumnValues);
+        console.log('rowData', rowData);
+        console.log('textAlignment', textAlignment);
+        console.log('fontFamily', fontFamily);
+        console.log('fontType', fontType);
+        console.log('selectedStyle', selectedStyle);
+        console.log('rows', rows);
+        console.log('columns', columns);
+        console.log('gutter', gutter);
+        
         
         try {
             await sandboxProxy.createTable({ columns, rows, gutter, selectedStyle, columnValues: currentColumnValues, rowData, textAlignment });
@@ -88,6 +119,17 @@ const AddTables: React.FC<IAdd> = ({ sandboxProxy, rows, rowData, columns, colum
         }
     }
     
+    /**
+     * Resets all table-related state variables to their default values.
+     * This includes:
+     * - Clearing CSV and row data
+     * - Resetting row and column counts
+     * - Clearing column values
+     * - Resetting filename
+     * - Resetting import/generation flags
+     * - Resetting styling options (font, type, alignment)
+     * - Clearing error messages
+     */
     const handleReset = () => {
         setCsvData([]);
         setRowData([]);
@@ -107,6 +149,10 @@ const AddTables: React.FC<IAdd> = ({ sandboxProxy, rows, rowData, columns, colum
         setErrorText(null)
     };
 
+    /**
+     * Handles the closing of toast notifications.
+     * Resets the generated state to false and clears any error text.
+     */
     const handleToastClose = () => {
         setGenerated(false);
         setErrorText(null);

@@ -42,6 +42,14 @@ const Tables: React.FC<ITableProps> = ({ selectedStyle, rowData, csvData, textAl
         return () => observer.disconnect();
     }, [selectedStyle]);
 
+    /**
+     * Configuration options for the React Tabulator instance
+     * @property {number} height - Sets the height of the table to 300 pixels
+     * @property {boolean} movableRows - Enables row dragging and reordering functionality
+     * @property {string} progressiveLoad - Enables progressive loading on scroll
+     * @property {number} progressiveLoadDelay - Sets delay of 200ms between loading batches of data
+     * @property {number} progressiveLoadScrollMargin - Sets scroll margin of 30 pixels for triggering new data load
+     */
     const options: ReactTabulatorOptions = {
         height: 300,
         movableRows: true,

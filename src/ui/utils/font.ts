@@ -1,6 +1,15 @@
 import { faker } from "@faker-js/faker";
 import { ITableStyle } from "./types";
 
+/**
+ * Array containing a list of common Windows system fonts.
+ * These fonts are typically available on Windows operating systems.
+ * The list includes various font families ranging from standard system fonts
+ * to decorative and display fonts.
+ * 
+ * @constant
+ * @type {string[]}
+ */
 export const winFontsC = [
     "Algerian",
     "Arial",
@@ -54,6 +63,44 @@ export const winFontsC = [
     "Webdings"
 ];
 
+/**
+ * Array of table style configurations for different table designs.
+ * Each style includes various visual properties such as colors and borders.
+ * @type {ITableStyle[]}
+ * 
+ * @property {number} id - Unique identifier for the table style
+ * @property {string} name - Display name of the table style
+ * @property {string} image - Image filename associated with the table style
+ * @property {Object} colors - Color configuration for different table elements
+ * @property {string} colors.header - Background color of the table header
+ * @property {string} colors.row - Background color of regular rows
+ * @property {string} colors.stroke - Color of table strokes/lines
+ * @property {string} colors.alt_row - Background color of alternate rows
+ * @property {string} colors.row_text - Text color for regular rows
+ * @property {string} colors.alt_row_text - Text color for alternate rows
+ * @property {string} colors.header_text - Text color for header
+ * @property {boolean} isActive - Flag indicating if the style is currently active
+ * @property {string} border - Border color of the table
+ * 
+ * @example
+ * // Basic table style
+ * {
+ *   id: 1,
+ *   name: "Basic table",
+ *   image: "table.png",
+ *   colors: {
+ *     header: "#FFFFFF",
+ *     row: "#FFFFFF",
+ *     stroke: "#000000",
+ *     alt_row: "#FFFFFF",
+ *     row_text: "#000000",
+ *     alt_row_text: "#000000",
+ *     header_text: "#000000"
+ *   },
+ *   isActive: true,
+ *   border: "#000000"
+ * }
+ */
 export const tableStyles: ITableStyle[] = [
     { id: 1, name: "Basic table", image: "table.png", colors: { header: "#FFFFFF", row: "#FFFFFF", stroke: "#000000", alt_row: "#FFFFFF", row_text: "#000000", alt_row_text: "#000000", header_text: "#000000" }, isActive: true, border:'#000000' },
     { id: 2, name: "Basic grey", image: "table_grey.png", colors: { header: "#000000", row: "#808080", stroke: "#FFFFFF", alt_row: "#C8C8C8", row_text: "#FFFFFF", alt_row_text: "#FFFFFF", header_text: "#FFFFFF" }, isActive: false, border:'grey' },
@@ -77,6 +124,18 @@ export const tableStyles: ITableStyle[] = [
     { id: 20, name: "Simple yellow", image: "table_2_yellow.png", colors: { header: "#FFFFEB", row: "#FFFFFF", stroke: "#FFD60B", alt_row: "#FCECAC", row_text: "#807540", alt_row_text: "#8B7505", header_text: "#807540" }, isActive: false, border: '#FFD60B' },
 ]
 
+/**
+ * Converts a hexadecimal color string to RGBA color values.
+ * @param hex - The hexadecimal color string (with or without leading '#')
+ * @returns An object containing normalized RGBA values (0-1 range)
+ * @property {number} red - The red component (0-1)
+ * @property {number} green - The green component (0-1) 
+ * @property {number} blue - The blue component (0-1)
+ * @property {number} alpha - The alpha component (always 1)
+ * @example
+ * // Returns { red: 1, green: 0, blue: 0, alpha: 1 }
+ * hexToRgba('#FF0000')
+ */
 export function hexToRgba(hex: string): { red: number, green: number, blue: number, alpha: number } {
     // Remove the leading # if present
     hex = hex.replace(/^#/, '');
@@ -97,6 +156,24 @@ export function hexToRgba(hex: string): { red: number, green: number, blue: numb
     return { red, green, blue, alpha };
 }
 
+/**
+ * Generates an array of mock data objects with random values.
+ * Each object contains various fields like Name, Address, Email, etc., populated with fake data.
+ * 
+ * @param numRows - The number of data rows/objects to generate
+ * @returns An array of objects containing mock data with the following properties:
+ *  - Name: A random full name
+ *  - Address: A random street address
+ *  - Email: A random email address
+ *  - Phone: A random phone number
+ *  - Website: A random URL
+ *  - Department: A random department name
+ *  - Product: A random product name
+ *  - Price: A random price value
+ *  - Company: A random company name
+ *  - Day: A random weekday
+ *  - Gender: A random gender value
+ */
 export const generateData = (numRows) => {
     const data = [];
     for (let i = 0; i < numRows; i++) {

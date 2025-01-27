@@ -15,12 +15,31 @@ type IOptions={
 }
 
 const Options: React.FC<IOptions> = ({textAlignment, setFontFamily, setFontType, setTextAlignment}) => {
+    /**
+     * Array of position options for alignment.
+     * @type {Array<{key: string, value: string}>}
+     * @constant
+     * @description Defines possible alignment positions: left, right, and center
+     * Each object contains:
+     * - key: string identifier for the position
+     * - value: corresponding position value
+     */
     const position = [
         { key: 'left', value: 'left' },
         { key: 'right', value: 'right' },
         { key: 'center', value: 'center' },
     ];
     
+    /**
+     * Handles changes to font-related options in the form.
+     * @param {React.ChangeEvent<HTMLSelectElement>} event - The change event from the select element.
+     * @returns {void}
+     * 
+     * Updates state based on the following select inputs:
+     * - font-family: Updates the font family selection
+     * - font-type: Updates the font type selection
+     * - text-alignment: Updates the text alignment selection
+     */
     const handleFontChange = (event: any) => {
         const { id, value } = event.target;
         if (id === 'font-family') {

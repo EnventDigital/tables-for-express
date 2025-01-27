@@ -38,7 +38,7 @@ const Data: React.FC<IDataProps> = ({ fileName, textAlignment, isImport, columns
     const columnsData: ColumnDefinition[] = [
         { title: "Name", field: "Name", width: 150 },
         { title: "Address", field: "Address", width: 150 },
-        { title: "Email", field: "Email", width: 150 },
+        { title: "Email", field: "Email", width: 300 },
         { title: "Phone", field: "Phone", width: 150 },
         { title: "Website", field: "Website", width: 150 },
         { title: "Department", field: "Department", width: 150 },
@@ -49,28 +49,76 @@ const Data: React.FC<IDataProps> = ({ fileName, textAlignment, isImport, columns
         { title: "Gender", field: "Gender", width: 150 }
     ];
 
+    /**
+     * Handles changes to the number of rows in the table.
+     * Updates the rows state and generates new data based on the updated row count.
+     * 
+     * @param event - The change event from the row input element
+     * @param event.target._value - The new number of rows selected
+     */
     const handleRowsChange = (event: any) => {
         setRows(Number(event.target._value));
         const data = generateData(Number(event.target._value));
         setRowData(data);
+
+        console.log('rows', rows);
+        console.log('rows_value', event.target._value);
+        console.log('data', data);
+        
     };
 
 
-    // Handles the change event for the columns input field.
+    /**
+     * Handles changes in the number of columns selected.
+     * 
+     * @param event - The event object from the column selection input
+     * @param event.target._value - The selected number of columns
+     * 
+     * Updates the following states:
+     * - columns: Sets the new number of columns
+     * - csvData: Slices the columnsData array to match the new column count
+     * - columnValues: Generates an object with column names as keys and field values
+     *      from columnsData as values, up to the selected number of columns
+     */
     const handleColumnsChange = (event: any) => {
         const col = Number(event.target._value);
         setColumns(Number(event.target._value));
-        setCsvData(columnsData.slice(0, event.target._value))
+        setCsvData(columnsData.slice(0, event.target._value));
 
-        
+               
         const initialColumnValues = Array.from({ length:  col}).reduce((acc, _, index) => {
             acc[`Column ${index + 1}`] = columnsData[index]?.field || "";
             return acc;
         }, {} as { [key: string]: string });
 
+        console.log('initialColumnValues', initialColumnValues);
+        
+
         setColumnValues(initialColumnValues as { [key: string]: string });
+        console.log('columnValues', columnValues);
+        console.log('columnsData', columnsData);
+        console.log('columns', columns);
+        console.log('col', col);
+        console.log('event.target._value', event.target._value);
+
     };
 
+    /**
+     * Handles changes in the column picker dropdown.
+     * 
+     * @param event - The change event from the dropdown picker
+     * @description This function updates the column values and CSV data when a user selects a new value in the column picker.
+     * It performs the following operations:
+     * 1. Updates the column values state with the new selection
+     * 2. Maps through the existing CSV data to update column fields and titles
+     * 3. Regenerates the row data to align with the updated column structure
+     * 
+     * @example
+     * <select id="Column 1" onChange={handlePickerChange}>
+     *   <option value="name">Name</option>
+     *   <option value="age">Age</option>
+     * </select>
+     */
     const handlePickerChange = (event: any) => {
         const { id, value } = event.target;
 
@@ -108,6 +156,13 @@ const Data: React.FC<IDataProps> = ({ fileName, textAlignment, isImport, columns
         });
     };
 
+    /**
+     * Handles the switch between import and manual table creation modes.
+     * Resets all table-related states when the switch changes.
+     * 
+     * @param {React.ChangeEvent<HTMLInputElement>} event - The change event from the switch input
+     * @returns {void}
+     */
     const handleImportSwitch = (event: any) => {
         setIsImport(event.target.checked)
         setCsvData([]);
@@ -117,7 +172,24 @@ const Data: React.FC<IDataProps> = ({ fileName, textAlignment, isImport, columns
         setColumns(0);
     };
 
-    // Handles the file change event.
+    /**
+     * Handles CSV file upload and parsing.
+     * Uses Papa Parse to process the CSV file and extract data.
+     * 
+     * @param event - The file input change event
+     * 
+     * The function:
+     * 1. Extracts the first file from the input
+     * 2. Updates the file name and import status state
+     * 3. Parses the CSV file using Papa Parse
+     * 4. Extracts column headers and creates column definitions
+     * 5. Updates the CSV data and row data states
+     * 
+     * @remarks
+     * - Assumes first row contains headers (header: true)
+     * - Applies text alignment to both header and content cells
+     * - Column definitions follow Tabulator format
+     */
     const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0];
         if (file) {
@@ -145,6 +217,16 @@ const Data: React.FC<IDataProps> = ({ fileName, textAlignment, isImport, columns
         }
     };
 
+    /**
+     * Truncates a file name to a specified maximum length while preserving the file extension.
+     * @param name - The original file name to be truncated
+     * @param maxLength - The maximum length allowed for the truncated file name
+     * @returns The truncated file name if it exceeds maxLength, or the original name if it doesn't
+     * 
+     * @example
+     * truncateFileName("very_long_filename.txt", 15) // returns "very_lon...txt"
+     * truncateFileName("short.txt", 15) // returns "short.txt"
+     */
     const truncateFileName = (name: string, maxLength: number) => {
         if (name.length <= maxLength) {
             return name;

@@ -34,7 +34,31 @@ const App = ({ addOnUISdk, sandboxProxy }: { addOnUISdk: AddOnSDKAPI; sandboxPro
         // You may use "addOnUISdk.app.ui.theme" to get the current theme and react accordingly.
         <Theme theme="express" scale="medium" color="light">
             <div className="container">
-                <AddTables sandboxProxy={sandboxProxy} csvData={csvData} rowData={rowData} rows={rows} columns={columns} columnValues={columnValues} fontFamily={fontFamily} fontType={fontType} textAlignment={textAlignment} isImport={isImport} imported={imported} selectedStyle={selectedStyle} setCsvData={setCsvData} setColumnValues={setColumnValues} setColumns={setColumns} setRowData={setRowData} setRows={setRows} setImported={setImported} setIsImport={setIsImport} setStyle={setSelectedStyle} setFontFamily={setFontFamily} setTextAlignment={setTextAlignment} setFontType={setFontType} />
+                <AddTables 
+                    sandboxProxy={sandboxProxy} 
+                    csvData={csvData} 
+                    rowData={rowData} 
+                    rows={rows} 
+                    columns={columns} 
+                    columnValues={columnValues} 
+                    fontFamily={fontFamily} 
+                    fontType={fontType} 
+                    textAlignment={textAlignment} 
+                    isImport={isImport} 
+                    imported={imported} 
+                    selectedStyle={selectedStyle} 
+                    setCsvData={setCsvData} 
+                    setColumnValues={setColumnValues} 
+                    setColumns={setColumns} 
+                    setRowData={setRowData} 
+                    setRows={setRows} 
+                    setImported={setImported} 
+                    setIsImport={setIsImport} 
+                    setStyle={setSelectedStyle} 
+                    setFontFamily={setFontFamily} 
+                    setTextAlignment={setTextAlignment} 
+                    setFontType={setFontType} 
+                />
             </div>
         </Theme>
     );
