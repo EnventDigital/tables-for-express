@@ -56,7 +56,8 @@ function start(): void {
 
             return wrappedText + line.trim();
         },
-        createRectangle({ width, height, color, x, y, textContent, textAlignment, strokeColor, strokeWidth }): GroupNode | null {
+
+        createRectangle({ width, height, color, textColor, x, y, textContent, textAlignment, strokeColor, strokeWidth }): GroupNode | null {
             const padding = 10
             try {
                 if (width <= 0 || height <= 0) {
@@ -77,10 +78,20 @@ function start(): void {
                 const text = editor.createText();
                 const stringified = String(textContent);
                 text.text = stringified;
+
+                
+                // @ts-ignore\
+                text.fullContent.applyCharacterStyles({
+                    fontSize: 15,
+                    color: textColor,
+                })
+
                 const textWidth = text.boundsLocal.width
+                
+                
 
                 if (textWidth > width - 2 * padding) {
-                    text.text = sandboxApi.wrapText({ textContent: stringified, width: width - 2 * padding, textWidth });
+                    // text.text = sandboxApi.wrapText({ textContent: stringified, width: width - 2 * padding, textWidth });
                 }
 
                 // Set text alignment
@@ -110,7 +121,7 @@ function start(): void {
             }
         },
 
-        createColumn({ columnIndex, columnWidth, rowHeight, gutter, color, textContent, textAlignment, strokeColor, strokeWidth }): GroupNode | null {
+        createColumn({ columnIndex, columnWidth, rowHeight, gutter, color, textColor, textContent, textAlignment, strokeColor, strokeWidth }): GroupNode | null {
             try {
                 if (columnWidth <= 0 || rowHeight <= 0) {
                     throw new Error("Invalid column dimensions.");
@@ -118,8 +129,9 @@ function start(): void {
 
                 const x = gutter + (gutter + columnWidth) * columnIndex;
                 const columnGroup = editor.createGroup();
+                // const textColor = hexToRgba("#000000");
 
-                const headerRect = sandboxApi.createRectangle({ width: columnWidth, height: rowHeight, color, x, y: gutter, textContent, textAlignment, strokeColor, strokeWidth });
+                const headerRect = sandboxApi.createRectangle({ width: columnWidth, height: rowHeight, color, textColor, x, y: gutter, textContent, textAlignment, strokeColor, strokeWidth });
                 if (headerRect) {
                     columnGroup.children.append(headerRect);
                 } else {
@@ -145,6 +157,7 @@ function start(): void {
 
                 const isEvenRow = rowIndex % 2 === 0;
                 const rowColor = isEvenRow ? hexToRgba(selectedStyle.colors.alt_row) : color;
+                const textColor = isEvenRow ? hexToRgba(selectedStyle.colors.alt_row_text) : hexToRgba(selectedStyle.colors.row_text);
 
                 for (let i = 0; i < columns; i++) {
                     const cellTextContent = rowValues[i] || `Row ${rowIndex + 1}, Col ${i + 1}`;
@@ -152,6 +165,7 @@ function start(): void {
                         width: columnWidth,
                         height: rowHeight,
                         color: rowColor,
+                        textColor,
                         x: gutter + (gutter + columnWidth) * i,
                         y,
                         textContent: cellTextContent,
@@ -173,6 +187,7 @@ function start(): void {
                 throw error
             }
         },
+
 
         createTable({ columns, rows, gutter, selectedStyle, columnValues, rowData, textAlignment }): void {
 
@@ -215,6 +230,7 @@ function start(): void {
                         rowHeight,
                         gutter,
                         color: columnColor,
+                        textColor: hexToRgba(selectedStyle.colors.header_text),
                         textContent: columnText,
                         textAlignment,
                         strokeColor: selectedStyle.colors.stroke,
@@ -267,7 +283,11 @@ function start(): void {
                 }
         
                 page.artboards.first.children.append(tableGroup);
-                tableGroup.locked = true;
+                // tableGroup.locked = true;
+                
+
+                
+                
             } catch (error) {
                 console.error("Error creating table:", error.message);
                 throw error;
