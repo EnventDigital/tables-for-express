@@ -35,7 +35,10 @@ module.exports = {
             excludeChunks: ["code"]
         }),
         new CopyWebpackPlugin({
-            patterns: [{ from: "src/*.json", to: "[name][ext]" }]
+            patterns: [
+                { from: "src/*.json", to: "[name][ext]" },
+                { from: "src/images/*.png", to: "images/[name][ext]" },
+            ]
         })
     ],
     module: {
