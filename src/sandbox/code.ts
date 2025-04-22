@@ -1,5 +1,5 @@
 import addOnSandboxSdk from "add-on-sdk-document-sandbox";
-import { colorUtils, editor, GroupNode, RectangleNode, TextNode } from "express-document-sdk";
+import { colorUtils, editor, GroupNode, RectangleNode, TextNode, EditorEvent } from "express-document-sdk";
 import { DocumentSandboxApi } from "../models/DocumentSandboxApi";
 import { hexToRgba } from '../ui/utils/font';
 
@@ -10,6 +10,8 @@ const { runtime } = addOnSandboxSdk.instance;
 
 // Track the current table group for selection operations
 let currentTableGroup: GroupNode | null = null;
+// Store selection change handler ID for cleanup
+let selectionChangeHandlerId: string | null = null;
 
 function start(): void {
     const sandboxApi: DocumentSandboxApi = {
@@ -415,6 +417,9 @@ function start(): void {
                 console.log(`Table created with metadata. Table ID: ${tableGroup.id}`);
                 console.log(`Metadata keys: ${tableGroup.addOnData.keys()}`);
                 
+                // Register selection change handler after creating the table
+                this.registerSelectionChangeHandler();
+                
                 // Scale table if it's too wide for the editor
                 const editorWidth = editor.context.currentPage.width;
                 const actualTableWidth = tableGroup.boundsLocal.width;
@@ -433,7 +438,119 @@ function start(): void {
             }
         },
 
-        // New selection methods
+        async registerSelectionChangeHandler(): Promise<void> {
+            try {
+                // Debug logging to confirm this function is called
+                console.log('Selection handler: Function called');
+                
+                // First, unregister any existing handler to avoid duplicates
+                if (selectionChangeHandlerId) {
+                    console.log('Selection handler: Removing previous handler');
+                    editor.context.off(EditorEvent.selectionChange, selectionChangeHandlerId);
+                    selectionChangeHandlerId = null;
+                }
+                
+                // Register a new handler for selection changes using the simplest approach
+                // Use an async callback function
+                selectionChangeHandlerId = editor.context.on(EditorEvent.selectionChange, async () => {
+                    console.log('Selection handler: Selection changed');
+                    
+                    // Get the current selection
+                    const selection = editor.context.selection;
+                    console.log(`Selection handler: ${selection.length} node(s) selected`);
+                    
+                    if (selection.length > 0) {
+                        // Process each selected node asynchronously
+                        for (let i = 0; i < selection.length; i++) {
+                            const node = selection[i];
+                            console.log(`Selection handler: Selected node ID: ${node.id}`);
+                            
+                            // Check if this node has our table metadata
+                            if (node.addOnData && typeof node.addOnData.getItem === 'function') {
+                                try {
+                                    const tableData = await node.addOnData.getItem(TABLE_METADATA_KEY);
+                                    if (tableData) {
+                                        console.log(`Selection handler: Table found in selection`);
+                                        
+                                        // Update the current table reference if it's a group node
+                                        if (node instanceof GroupNode) {
+                                            currentTableGroup = node;
+                                            console.log('Selection handler: Updated current table reference');
+                                        }
+                                    }
+                                } catch (err) {
+                                    console.error('Selection handler: Error checking node metadata:', err);
+                                }
+                            }
+                            
+                            // Also check if this is a group node that might be part of a table
+                            if (node instanceof GroupNode && node.parent && node.parent.addOnData) {
+                                try {
+                                    const parentTableData = await node.parent.addOnData.getItem(TABLE_METADATA_KEY);
+                                    if (parentTableData) {
+                                        console.log(`Selection handler: Selected node is part of a table`);
+                                        
+                                        // Update the current table reference to the parent
+                                        currentTableGroup = node.parent as GroupNode;
+                                        console.log('Selection handler: Updated current table reference to parent');
+                                    }
+                                } catch (err) {
+                                    console.error('Selection handler: Error checking parent metadata:', err);
+                                }
+                            }
+                        }
+                    }
+                });
+                
+                console.log('Selection handler: Registered with ID:', selectionChangeHandlerId);
+                
+                // Verify current selection immediately after registering
+                await this.checkCurrentSelection();
+                
+            } catch (error) {
+                console.error('Selection handler: Error registering handler:', error);
+            }
+        },
+        
+        // Helper method to check the current selection
+        async checkCurrentSelection(): Promise<void> {
+            try {
+                console.log('Selection helper: Checking current selection');
+                const selection = editor.context.selection;
+                
+                if (selection.length > 0) {
+                    console.log(`Selection helper: Found ${selection.length} selected node(s)`);
+                    
+                    // Process each selected node
+                    for (const node of selection) {
+                        console.log(`Selection helper: Checking node ID: ${node.id}`);
+                        
+                        // Check if this node has our table metadata
+                        if (node.addOnData && typeof node.addOnData.getItem === 'function') {
+                            try {
+                                const tableData = await node.addOnData.getItem(TABLE_METADATA_KEY);
+                                if (tableData) {
+                                    console.log(`Selection helper: Table found in current selection`);
+                                    
+                                    // Update the current table reference if it's a group node
+                                    if (node instanceof GroupNode) {
+                                        currentTableGroup = node;
+                                        console.log('Selection helper: Updated current table reference');
+                                    }
+                                }
+                            } catch (err) {
+                                console.error('Selection helper: Error checking node metadata:', err);
+                            }
+                        }
+                    }
+                } else {
+                    console.log('Selection helper: No nodes currently selected');
+                }
+            } catch (error) {
+                console.error('Selection helper: Error checking current selection:', error);
+            }
+        },
+
         async selectTableRow(rowIndex: number): Promise<boolean> {
             try {
                 if (!currentTableGroup) {
@@ -441,30 +558,73 @@ function start(): void {
                     return false;
                 }
 
+                // Additional verification that the table still exists in the document
+                // This handles the case where the table has been deleted but our reference hasn't been cleared
+                const rootNode = editor.context.currentPage.artboards.first; // Get the root artboard
+                if (!rootNode.children) {
+                    console.error("Cannot verify table existence - no children in root node");
+                    return false;
+                }
+                
+                // Try to find our table in the document's node hierarchy
+                let tableExists = false;
+                const checkNodeAndChildren = (node: any) => {
+                    if (node.id === currentTableGroup?.id) {
+                        tableExists = true;
+                        return true;
+                    }
+                    
+                    if (node.children) {
+                        for (let i = 0; i < node.children.length; i++) {
+                            if (checkNodeAndChildren(node.children.item(i))) {
+                                return true;
+                            }
+                        }
+                    }
+                    return false;
+                };
+                
+                checkNodeAndChildren(rootNode);
+                
+                if (!tableExists) {
+                    console.error("Table exists in memory but no longer found in document");
+                    currentTableGroup = null; // Clear our reference since the table is gone
+                    return false;
+                }
+
+                // Now check that the row we want to select is valid
+                if (!currentTableGroup.children || currentTableGroup.children.length === 0) {
+                    console.error("Table has no rows to select");
+                    return false;
+                }
+                
                 // Clear any existing selection
                 editor.context.selection = [];
-                
-                // Tables have a header row at index 0, followed by data rows
-                // The structure is:
-                // tableGroup
-                //   - headerRow (at index 0)
-                //   - dataRow 1 (at index 1, corresponding to rowIndex 0)
-                //   - dataRow 2 (at index 2, corresponding to rowIndex 1)
-                //   - etc.
                 
                 // Adjust rowIndex to account for the header row
                 const targetIndex = rowIndex + 1;
                 
-                if (targetIndex >= 0 && targetIndex < currentTableGroup.children.length) {
-                    const rowToSelect = currentTableGroup.children.item(targetIndex) as GroupNode;
-                    if (rowToSelect) {
-                        editor.context.selection = [rowToSelect];
-                        return true;
-                    }
+                if (targetIndex < 0 || targetIndex >= currentTableGroup.children.length) {
+                    console.error(`Row index ${rowIndex} is out of bounds (0-${currentTableGroup.children.length - 2})`);
+                    return false;
                 }
                 
-                console.error(`Row at index ${rowIndex} not found`);
-                return false;
+                const rowToSelect = currentTableGroup.children.item(targetIndex) as GroupNode;
+                if (!rowToSelect) {
+                    console.error(`Row at index ${rowIndex} not found`);
+                    return false;
+                }
+                
+                // Safely attempt to set the selection
+                try {
+                    editor.context.selection = [rowToSelect];
+                    return true;
+                } catch (selectionError) {
+                    console.error("Error setting selection:", selectionError.message);
+                    // If we get here, the node might exist in our reference but not in the actual document
+                    currentTableGroup = null; // Clear our reference
+                    return false;
+                }
             } catch (error) {
                 console.error("Error selecting table row:", error.message);
                 return false;
@@ -473,20 +633,60 @@ function start(): void {
 
         async selectTableColumn(columnIndex: number): Promise<boolean> {
             try {
-                if (!currentTableGroup || !currentTableGroup.children || currentTableGroup.children.length === 0) {
+                if (!currentTableGroup) {
                     console.error("No table exists to select a column from");
                     return false;
                 }
 
-                console.log(`Editor selection before:`, editor.context.selection);
-                console.log(`Current table group:`, currentTableGroup);
+                // Additional verification that the table still exists in the document
+                // This handles the case where the table has been deleted but our reference hasn't been cleared
+                const rootNode = editor.context.currentPage.artboards.first; // Get the root artboard
+                if (!rootNode.children) {
+                    console.error("Cannot verify table existence - no children in root node");
+                    return false;
+                }
                 
+                // Try to find our table in the document's node hierarchy
+                let tableExists = false;
+                const checkNodeAndChildren = (node: any) => {
+                    if (node.id === currentTableGroup?.id) {
+                        tableExists = true;
+                        return true;
+                    }
+                    
+                    if (node.children) {
+                        for (let i = 0; i < node.children.length; i++) {
+                            if (checkNodeAndChildren(node.children.item(i))) {
+                                return true;
+                            }
+                        }
+                    }
+                    return false;
+                };
+                
+                checkNodeAndChildren(rootNode);
+                
+                if (!tableExists) {
+                    console.error("Table exists in memory but no longer found in document");
+                    currentTableGroup = null; // Clear our reference since the table is gone
+                    return false;
+                }
 
+                // Verify table structure
+                if (!currentTableGroup.children || currentTableGroup.children.length === 0) {
+                    console.error("Table has no rows to select columns from");
+                    return false;
+                }
+
+                // Check if column index is valid by checking the first row
+                const firstRow = currentTableGroup.children.item(0) as GroupNode;
+                if (!firstRow || !firstRow.children || columnIndex >= firstRow.children.length) {
+                    console.error(`Column index ${columnIndex} is out of bounds (0-${firstRow.children ? firstRow.children.length - 1 : 0})`);
+                    return false;
+                }
 
                 // Clear any existing selection
                 editor.context.selection = [];
-
-                
                 
                 // We need to find all cells at the specified column index across all rows
                 const cellsToSelect = [];
@@ -502,13 +702,21 @@ function start(): void {
                     }
                 }
                 
-                if (cellsToSelect.length > 0) {
-                    editor.context.selection = cellsToSelect;
-                    return true;
+                if (cellsToSelect.length === 0) {
+                    console.error(`No cells found at column index ${columnIndex}`);
+                    return false;
                 }
                 
-                console.error(`Column at index ${columnIndex} not found`);
-                return false;
+                // Safely attempt to set the selection
+                try {
+                    editor.context.selection = cellsToSelect;
+                    return true;
+                } catch (selectionError) {
+                    console.error("Error setting selection:", selectionError.message);
+                    // If we get here, the nodes might exist in our reference but not in the actual document
+                    currentTableGroup = null; // Clear our reference
+                    return false;
+                }
             } catch (error) {
                 console.error("Error selecting table column:", error.message);
                 return false;
@@ -522,9 +730,51 @@ function start(): void {
                     return false;
                 }
 
-                // Select the entire table group
-                editor.context.selection = [currentTableGroup];
-                return true;
+                // Additional verification that the table still exists in the document
+                // This handles the case where the table has been deleted but our reference hasn't been cleared
+                const rootNode = editor.context.currentPage.artboards.first; // Get the root artboard
+                if (!rootNode.children) {
+                    console.error("Cannot verify table existence - no children in root node");
+                    return false;
+                }
+                
+                // Try to find our table in the document's node hierarchy
+                let tableExists = false;
+                const checkNodeAndChildren = (node: any) => {
+                    if (node.id === currentTableGroup?.id) {
+                        tableExists = true;
+                        return true;
+                    }
+                    
+                    if (node.children) {
+                        for (let i = 0; i < node.children.length; i++) {
+                            if (checkNodeAndChildren(node.children.item(i))) {
+                                return true;
+                            }
+                        }
+                    }
+                    return false;
+                };
+                
+                checkNodeAndChildren(rootNode);
+                
+                if (!tableExists) {
+                    console.error("Table exists in memory but no longer found in document");
+                    currentTableGroup = null; // Clear our reference since the table is gone
+                    return false;
+                }
+
+                // Safely attempt to set the selection
+                try {
+                    // Select the entire table group
+                    editor.context.selection = [currentTableGroup];
+                    return true;
+                } catch (selectionError) {
+                    console.error("Error setting selection:", selectionError.message);
+                    // If we get here, the node might exist in our reference but not in the actual document
+                    currentTableGroup = null; // Clear our reference
+                    return false;
+                }
             } catch (error) {
                 console.error("Error selecting entire table:", error.message);
                 return false;

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@swc-react/button';
 import { Picker } from '@swc-react/picker';
 import { Divider } from '@swc-react/divider';
@@ -48,6 +48,32 @@ const Results: React.FC<ResultsProps> = ({ sandboxProxy, rows, columns, generate
   const [selectedRow, setSelectedRow] = useState<number | null>(null);
   const [selectedColumn, setSelectedColumn] = useState<number | null>(null);
   const [selectionStatus, setSelectionStatus] = useState<string>('');
+  const [selectionError, setSelectionError] = useState<boolean>(false);
+  const [tableVerified, setTableVerified] = useState<boolean>(false);
+
+  // Verify table exists on component mount
+  useEffect(() => {
+    const verifyTable = async () => {
+      try {
+        // Try to select and immediately clear to check if table exists
+        const tableExists = await sandboxProxy.selectEntireTable();
+        await sandboxProxy.clearTableSelection();
+        
+        setTableVerified(true);
+        setSelectionError(!tableExists);
+        
+        if (!tableExists) {
+          setSelectionStatus('Table not found in document. It may have been deleted.');
+        }
+      } catch (error) {
+        console.error('Error verifying table existence:', error);
+        setSelectionError(true);
+        setSelectionStatus('Unable to verify table. It may have been deleted.');
+      }
+    };
+    
+    verifyTable();
+  }, [sandboxProxy]);
 
   // Generate options for row and column pickers
   const rowOptions = Array.from({ length: rows }, (_, i) => ({
@@ -61,78 +87,107 @@ const Results: React.FC<ResultsProps> = ({ sandboxProxy, rows, columns, generate
   }));
 
   const handleRowSelect = async (event: any) => {
+    if (selectionError) {
+      setSelectionStatus('Cannot select row - table no longer exists');
+      return;
+    }
+    
     // Debug logging to inspect the event object
     console.log('Row Select Event:', event);
-    console.log('Event type:', event.type);
-    console.log('Event target:', event.target);
-    console.log('Event currentTarget:', event.currentTarget);
     
-    if (event.target) {
-      console.log('Target value:', event.target.value);
-      console.log('Target selected:', event.target.selected);
-    }
-    
-    // Try different ways to access the value
-    if (event.detail) {
-      console.log('Event detail:', event.detail);
-    }
-    
-    // Try with React Spectrum patterns
     if (event.target && event.target.value !== undefined) {
       const rowIndex = parseInt(event.target.value);
       if (!isNaN(rowIndex)) {
         setSelectedRow(rowIndex);
         try {
-          await sandboxProxy.selectTableRow(rowIndex - 1); // Convert to 0-indexed
-          setSelectionStatus(`Selected row ${rowIndex}`);
+          const success = await sandboxProxy.selectTableRow(rowIndex - 1); // Convert to 0-indexed
+          
+          if (success) {
+            setSelectionStatus(`Selected row ${rowIndex}`);
+          } else {
+            // Table might have been deleted
+            setSelectionError(true);
+            setSelectionStatus('Table no longer exists in the document');
+          }
         } catch (error) {
           console.error('Error selecting row:', error);
-          setSelectionStatus(`Failed to select row: ${error.message}`);
+          
+          // Check if this is the "no valid nodes" error
+          if (error.message && error.message.includes('no valid nodes')) {
+            setSelectionError(true);
+            setSelectionStatus('Table no longer exists in the document');
+          } else {
+            setSelectionStatus(`Failed to select row: ${error.message}`);
+          }
         }
       }
     }
   };
 
   const handleColumnSelect = async (event: any) => {
+    if (selectionError) {
+      setSelectionStatus('Cannot select column - table no longer exists');
+      return;
+    }
+    
     // Debug logging to inspect the event object
     console.log('Column Select Event:', event);
-    console.log('Event type:', event.type);
-    console.log('Event target:', event.target);
-    console.log('Event currentTarget:', event.currentTarget);
     
-    if (event.target) {
-      console.log('Target value:', event.target.value);
-      console.log('Target selected:', event.target.selected);
-    }
-    
-    // Try different ways to access the value
-    if (event.detail) {
-      console.log('Event detail:', event.detail);
-    }
-    
-    // Try with React Spectrum patterns
     if (event.target && event.target.value !== undefined) {
       const columnIndex = parseInt(event.target.value);
       if (!isNaN(columnIndex)) {
         setSelectedColumn(columnIndex);
         try {
-          await sandboxProxy.selectTableColumn(columnIndex - 1); // Convert to 0-indexed
-          setSelectionStatus(`Selected column ${columnIndex}`);
+          const success = await sandboxProxy.selectTableColumn(columnIndex - 1); // Convert to 0-indexed
+          
+          if (success) {
+            setSelectionStatus(`Selected column ${columnIndex}`);
+          } else {
+            // Table might have been deleted
+            setSelectionError(true);
+            setSelectionStatus('Table no longer exists in the document');
+          }
         } catch (error) {
           console.error('Error selecting column:', error);
-          setSelectionStatus(`Failed to select column: ${error.message}`);
+          
+          // Check if this is the "no valid nodes" error
+          if (error.message && error.message.includes('no valid nodes')) {
+            setSelectionError(true);
+            setSelectionStatus('Table no longer exists in the document');
+          } else {
+            setSelectionStatus(`Failed to select column: ${error.message}`);
+          }
         }
       }
     }
   };
 
   const handleSelectAll = async () => {
+    if (selectionError) {
+      setSelectionStatus('Cannot select table - it no longer exists');
+      return;
+    }
+    
     try {
-      await sandboxProxy.selectEntireTable();
-      setSelectionStatus('Selected entire table');
+      const success = await sandboxProxy.selectEntireTable();
+      
+      if (success) {
+        setSelectionStatus('Selected entire table');
+      } else {
+        // Table might have been deleted
+        setSelectionError(true);
+        setSelectionStatus('Table no longer exists in the document');
+      }
     } catch (error) {
       console.error('Error selecting all:', error);
-      setSelectionStatus(`Failed to select all: ${error.message}`);
+      
+      // Check if this is the "no valid nodes" error
+      if (error.message && error.message.includes('no valid nodes')) {
+        setSelectionError(true);
+        setSelectionStatus('Table no longer exists in the document');
+      } else {
+        setSelectionStatus(`Failed to select all: ${error.message}`);
+      }
     }
   };
 
@@ -152,6 +207,35 @@ const Results: React.FC<ResultsProps> = ({ sandboxProxy, rows, columns, generate
     return (
       <div style={styles.flexAlignCenter}>
         <h4 style={styles.heading4}>Generate a table first to see results</h4>
+      </div>
+    );
+  }
+
+  // Show a loading state while verifying table existence
+  if (!tableVerified) {
+    return (
+      <div style={{...styles.flexColumn, ...styles.container}}>
+        <h4 style={styles.heading4}>Verifying Table</h4>
+        <p>Checking if table still exists in the document...</p>
+      </div>
+    );
+  }
+
+  // Show an error state if the table doesn't exist
+  if (selectionError) {
+    return (
+      <div style={{...styles.flexColumn, ...styles.container}}>
+        <div style={{ 
+          padding: '15px', 
+          backgroundColor: '#FFF4F4', 
+          border: '1px solid #FFCDD2',
+          borderRadius: '4px',
+          marginBottom: '16px'
+        }}>
+          <h4 style={{ color: '#D32F2F', margin: '0 0 8px 0' }}>Table Not Found</h4>
+          <p>The table appears to have been deleted from the document.</p>
+          <p>Please go back and create a new table.</p>
+        </div>
       </div>
     );
   }

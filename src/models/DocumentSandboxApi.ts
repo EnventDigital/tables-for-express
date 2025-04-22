@@ -103,4 +103,22 @@ export interface DocumentSandboxApi {
      * @returns {void}
      */
     listNodeMetadata(): void;
+    
+    /**
+     * Registers a handler for document selection changes.
+     * This allows the add-on to monitor when the user selects different objects
+     * and detect when tables created by this add-on are selected.
+     * 
+     * @returns {Promise<void>}
+     */
+    registerSelectionChangeHandler(): Promise<void>;
+    
+    /**
+     * Helper method to check the current selection for tables.
+     * This can be called at any time to analyze the current selection
+     * and update the current table reference if a table is selected.
+     * 
+     * @returns {Promise<void>}
+     */
+    checkCurrentSelection(): Promise<void>;
 }
