@@ -43,13 +43,42 @@ type IAdd = {
     setIsImport: React.Dispatch<React.SetStateAction<boolean>>
     setImported: React.Dispatch<React.SetStateAction<boolean>>
     setStyle: React.Dispatch<React.SetStateAction<ITableStyle>>
+    onTableCreated: () => void // Callback to trigger navigation to results page
 }
 
-const AddTables: React.FC<IAdd> = ({ sandboxProxy, rows, rowData, columns, columnValues, csvData, textAlignment, fontFamily, fontType, isImport, imported, selectedStyle, setCsvData, setColumnValues, setColumns, setFontFamily, setFontType, setImported, setIsImport, setRowData, setRows, setStyle, setTextAlignment }) => {
+const AddTables: React.FC<IAdd> = ({ 
+    sandboxProxy, 
+    rows, 
+    rowData, 
+    columns, 
+    columnValues, 
+    csvData, 
+    textAlignment, 
+    fontFamily, 
+    fontType, 
+    isImport, 
+    imported, 
+    selectedStyle, 
+    setCsvData, 
+    setColumnValues, 
+    setColumns, 
+    setFontFamily, 
+    setFontType, 
+    setImported, 
+    setIsImport, 
+    setRowData, 
+    setRows, 
+    setStyle, 
+    setTextAlignment,
+    onTableCreated
+}) => {
     const [isLoading, setIsLoading] = useState<boolean>(false); // Loading state
     const [fileName, setFileName] = useState<string>('');
-    const [generated, setGenerated] = useState<boolean>(false);
     const [errorText, setErrorText] = useState<any>(null);
+    const [selectedTab, setSelectedTab] = useState<string>("Data");
+
+    // Reference to the tabs element
+    const tabsRef = useRef<any>(null);
 
     useEffect(() => {
         if (imported && csvData.length > 0) {
@@ -78,14 +107,12 @@ const AddTables: React.FC<IAdd> = ({ sandboxProxy, rows, rowData, columns, colum
      * 
      * @throws Will propagate any errors from the sandboxProxy.createTable call
      * 
-     * @param {any} event - The event object (TODO: specify exact event type)
+     * @param {any} event - The event object
      * @returns {Promise<void>}
      */
     const handleCreate = async (event: any) => {
         setIsLoading(true); // Set loading state to true
         let currentColumnValues = columnValues;
-
-        
 
         if (!imported && csvData.length > 0) {
             const newColumnValues: { [key: string]: string } = {};
@@ -95,25 +122,22 @@ const AddTables: React.FC<IAdd> = ({ sandboxProxy, rows, rowData, columns, colum
             currentColumnValues = newColumnValues;
         }
         const gutter = 0;
-        console.log('columnValues', columnValues);
-        console.log('currentColumnValues', currentColumnValues);
-        console.log('rowData', rowData);
-        console.log('textAlignment', textAlignment);
-        console.log('fontFamily', fontFamily);
-        console.log('fontType', fontType);
-        console.log('selectedStyle', selectedStyle);
-        console.log('rows', rows);
-        console.log('columns', columns);
-        console.log('gutter', gutter);
-        
         
         try {
-            await sandboxProxy.createTable({ columns, rows, gutter, selectedStyle, columnValues: currentColumnValues, rowData, textAlignment });
-            setGenerated(true)
+            await sandboxProxy.createTable({ 
+                columns, 
+                rows, 
+                gutter, 
+                selectedStyle, 
+                columnValues: currentColumnValues, 
+                rowData, 
+                textAlignment 
+            });
+            
+            // After successful table creation, navigate to the results page
+            onTableCreated();
         } catch (error) {
-            setGenerated(false);
-            setErrorText(error.message)
-            // console.error("Error creating table in add:", error.message);
+            setErrorText(error.message);
         } finally {
             setIsLoading(false); // Set loading state to false after the table is created
         }
@@ -129,6 +153,7 @@ const AddTables: React.FC<IAdd> = ({ sandboxProxy, rows, rowData, columns, colum
      * - Resetting import/generation flags
      * - Resetting styling options (font, type, alignment)
      * - Clearing error messages
+     * - Switching back to the Data tab
      */
     const handleReset = () => {
         setCsvData([]);
@@ -144,17 +169,19 @@ const AddTables: React.FC<IAdd> = ({ sandboxProxy, rows, rowData, columns, colum
         setFontType('normal');
         setStyle(tableStyles[7]);
         setTextAlignment('left');
-        // setIsLoading(false);
-        setGenerated(false);
-        setErrorText(null)
+        setErrorText(null);
+        
+        // Switch back to the Data tab
+        setSelectedTab("Data");
+        if (tabsRef.current) {
+            tabsRef.current.selected = "Data";
+        }
     };
 
     /**
      * Handles the closing of toast notifications.
-     * Resets the generated state to false and clears any error text.
      */
     const handleToastClose = () => {
-        setGenerated(false);
         setErrorText(null);
     }
 
@@ -163,7 +190,10 @@ const AddTables: React.FC<IAdd> = ({ sandboxProxy, rows, rowData, columns, colum
             {!isLoading &&
                 <>
                     <h2>Add Table</h2>
-                    <sp-tabs selected="Data" size="m" compact style={{ height: isImport ? "250px" : "150px" }}>
+                    <sp-tabs ref={tabsRef} selected={selectedTab} size="m" compact style={{ 
+                        height: "280px", // Fixed height for all conditions
+                        marginBottom: '5px'
+                    }}>
                         <sp-tab label="Data" value="Data"></sp-tab>
                         <sp-tab label="Design" value="Design"></sp-tab>
                         <sp-tab label="Options" value="Options"></sp-tab>
@@ -171,7 +201,24 @@ const AddTables: React.FC<IAdd> = ({ sandboxProxy, rows, rowData, columns, colum
                         <sp-tab-panel value="Data"><Data fileName={fileName} setFileName={setFileName} columnValues={columnValues} setImported={setImported} textAlignment={textAlignment} isImport={isImport} setIsImport={setIsImport} setCsvData={setCsvData} setRowData={setRowData} columns={columns} rows={rows} setColumnValues={setColumnValues} setColumns={setColumns} setRows={setRows} /></sp-tab-panel>
                         <sp-tab-panel value="Options"><Options setFontFamily={setFontFamily} setFontType={setFontType} setTextAlignment={setTextAlignment} textAlignment={textAlignment}  /></sp-tab-panel>
                     </sp-tabs>
-                    <Tables setRowData={setRowData} setCsvData={setCsvData} selectedStyle={selectedStyle} csvData={csvData} rowData={rowData} isImport={isImport} columnValues={columnValues} columns={columns} rows={rows} fontFamily={fontFamily} fontType={fontType} textAlignment={textAlignment} />
+                    
+                    {/* Table preview container with direct visibility control */}
+                    <div style={{ display: "block" }}>
+                        <Tables 
+                            setRowData={setRowData}
+                            setCsvData={setCsvData}
+                            selectedStyle={selectedStyle}
+                            csvData={csvData}
+                            rowData={rowData}
+                            isImport={isImport}
+                            columnValues={columnValues}
+                            columns={columns}
+                            rows={rows}
+                            fontFamily={fontFamily}
+                            fontType={fontType}
+                            textAlignment={textAlignment}
+                        />
+                    </div>
                 </>
             }
             {isLoading &&
@@ -191,16 +238,8 @@ const AddTables: React.FC<IAdd> = ({ sandboxProxy, rows, rowData, columns, colum
                     Reset
                 </Button>
             </div>
-            <Toast open={generated}
-                id='spectrum-toast'
-                style={{ width: "90%", position: 'fixed', top: "80%", zIndex: 3 }}
-                variant='positive'
-                timeout={7000}
-                close={handleToastClose}
-            >
-                Table created successfully
-            </Toast>
-            <Toast open={errorText}
+            <Toast 
+                open={!!errorText}
                 id='spectrum-error-toast'
                 style={{ width: "90%", position: 'fixed', top: "80%", zIndex: 3 }}
                 variant='negative'

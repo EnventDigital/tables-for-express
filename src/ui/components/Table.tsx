@@ -21,7 +21,6 @@ type ITableProps = {
 }
 
 const Tables: React.FC<ITableProps> = ({ selectedStyle, rowData, csvData, textAlignment, columns, columnValues }) => {
-
     useEffect(() => {
         const applyStyles = () => {
             const headerElements = document.getElementsByClassName('tabulator-col');
@@ -44,25 +43,32 @@ const Tables: React.FC<ITableProps> = ({ selectedStyle, rowData, csvData, textAl
 
     /**
      * Configuration options for the React Tabulator instance
-     * @property {number} height - Sets the height of the table to 300 pixels
+     * @property {number} height - Sets the height of the table to 200 pixels
      * @property {boolean} movableRows - Enables row dragging and reordering functionality
      * @property {string} progressiveLoad - Enables progressive loading on scroll
      * @property {number} progressiveLoadDelay - Sets delay of 200ms between loading batches of data
      * @property {number} progressiveLoadScrollMargin - Sets scroll margin of 30 pixels for triggering new data load
      */
     const options: ReactTabulatorOptions = {
-        height: 300,
+        height: 200, // Reduced from 300px to 200px
         movableRows: true,
         progressiveLoad: 'scroll',
         progressiveLoadDelay: 200,
         progressiveLoadScrollMargin: 30,
-        
     };
+
+    // Generate a key to ensure proper rendering when data changes
+    const tableKey = JSON.stringify({ selectedStyle, textAlignment, columns, columnValues, csvData });
+
     return (
-        <div className='table-container fixed-height' id="example-table">
+        <div className='table-container fixed-height' id="example-table" style={{ 
+            marginTop: '25px', // Increased from 15px to 25px for more space below tabs
+            borderTop: '1px solid #e0e0e0',
+            paddingTop: '10px'
+        }}>
             {(csvData.length > 0) && (
                 <ReactTabulator
-                    key={JSON.stringify({ selectedStyle, textAlignment, columns, columnValues, csvData })}
+                    key={tableKey}
                     data={rowData}
                     columns={csvData.map(col => ({
                         ...col,
