@@ -3,8 +3,8 @@ import { colorUtils, editor, GroupNode, RectangleNode, TextNode } from "express-
 import { DocumentSandboxApi } from "../models/DocumentSandboxApi";
 import { hexToRgba } from '../ui/utils/font';
 
-// Extend the editor type to include selection
-
+// Define metadata key for tables
+const TABLE_METADATA_KEY = "tables-for-express-table";
 
 const { runtime } = addOnSandboxSdk.instance;
 
@@ -205,8 +205,6 @@ function start(): void {
             }
         },
 
-
-
         createTable({ columns, rows, gutter, selectedStyle, columnValues, rowData, textAlignment }): void {
             console.log(`Editor selection before:`, editor);
             
@@ -405,6 +403,18 @@ function start(): void {
                 // Add table to the artboard
                 page.artboards.first.children.append(tableGroup);
                 
+                // Add metadata to the table group for tracking using the table's own ID
+                tableGroup.addOnData.setItem(TABLE_METADATA_KEY, JSON.stringify({
+                    nodeId: tableGroup.id,
+                    columns,
+                    rows,
+                    createdAt: new Date().toISOString()
+                }));
+                
+                // Log the metadata for debugging
+                console.log(`Table created with metadata. Table ID: ${tableGroup.id}`);
+                console.log(`Metadata keys: ${tableGroup.addOnData.keys()}`);
+                
                 // Scale table if it's too wide for the editor
                 const editorWidth = editor.context.currentPage.width;
                 const actualTableWidth = tableGroup.boundsLocal.width;
@@ -530,7 +540,35 @@ function start(): void {
                 console.error("Error clearing table selection:", error.message);
                 return false;
             }
-        }
+        },
+
+        // Add function to list all metadata keys on a node
+        listNodeMetadata(): void {
+            try {
+                if (!currentTableGroup) {
+                    console.log("No current table group to check metadata");
+                    return;
+                }
+                
+                console.log(`Checking metadata for table with ID: ${currentTableGroup.id}`);
+                
+                // Get all metadata keys
+                const keys = currentTableGroup.addOnData.keys();
+                
+                if (!keys || keys.length === 0) {
+                    console.log("No metadata found on this node");
+                    return;
+                }
+                
+                // Iterate over all keys
+                keys.forEach((key) => {
+                    console.log(`Key: ${key}, Value: ${currentTableGroup?.addOnData.getItem(key)}`);
+                });
+                
+            } catch (error) {
+                console.error("Error listing node metadata:", error);
+            }
+        },
     };
 
     runtime.exposeApi(sandboxApi);

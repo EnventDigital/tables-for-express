@@ -95,4 +95,12 @@ export interface DocumentSandboxApi {
      * @returns {Promise<boolean>} True if successful, false otherwise
      */
     clearTableSelection(): Promise<boolean>;
+
+    /**
+     * Lists all metadata keys and values on the current table group.
+     * This is a diagnostic function to verify metadata is being stored correctly.
+     * 
+     * @returns {void}
+     */
+    listNodeMetadata(): void;
 }
