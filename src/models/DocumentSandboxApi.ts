@@ -42,48 +42,6 @@ export interface DocumentSandboxApi {
      */
     createTable({ columns, rows, gutter, selectedStyle, columnValues, rowData, textAlignment}): void;
 
-    /**
-     * Creates a row of cells in a table layout.
-     * 
-     * @param {Object} params - The parameters for creating the row
-     * @param {number} params.rowIndex - The index of the row (0-based)
-     * @param {number} params.columns - The number of columns in the row
-     * @param {number} params.columnWidth - The width of each column
-     * @param {number} params.rowHeight - The height of the row
-     * @param {number} params.gutter - The spacing between cells and rows
-     * @param {string} params.color - The default color for cells in this row
-     * @param {Array<string>} params.rowValues - Array of text values for each cell in the row
-     * @param {Object} params.selectedStyle - Style configuration object containing colors property
-     * @param {string} params.textAlignment - The alignment of text within cells
-     * @param {string} params.strokeColor - The color of the cell borders
-     * @param {number} params.strokeWidth - The width of the cell borders
-     * 
-     * @returns {GroupNode | null} A group node containing the row's cells, or null if creation fails
-     * 
-     * @throws {Error} When invalid dimensions or column count are provided
-     * @throws {Error} When cell creation fails
-     */
-    createRow({rowIndex, columns, columnWidth, rowHeight, gutter, color, selectedStyle, rowValues, textAlignment, strokeColor, strokeWidth }): any;
-
-    /**
-     * Creates a column with specified dimensions, color, and text content.
-     * 
-     * @param {Object} params - The parameters for creating the column
-     * @param {number} params.columnIndex - The index of the column (0-based)
-     * @param {number} params.columnWidth - The width of the column
-     * @param {number} params.rowHeight - The height of the column's header row
-     * @param {number} params.gutter - The spacing between columns
-     * @param {string} params.color - The fill color of the column's header row
-     * @param {string} params.textContent - The text content inside the column's header row
-     * @param {string} params.textAlignment - The alignment of the text within the column's header row
-     * @param {string} params.strokeColor - The color of the column's border
-     * @param {number} params.strokeWidth - The width of the column's border
-     * 
-     * @returns {GroupNode | null} A group node containing the column's header row, or null if creation fails
-     * 
-     * @throws {Error} When invalid dimensions are provided
-     */
-    createColumn ({columnIndex, columnWidth, rowHeight, gutter, color, textColor, textContent, textAlignment, strokeColor, strokeWidth}): any;
 
     /**
      * Wraps text to fit within a specified width.
@@ -105,4 +63,62 @@ export interface DocumentSandboxApi {
      * @returns {number} The width of the text string
      */
     calculateTextWidth(text): any;
+
+    /**
+     * Selects a specific row in the table.
+     * 
+     * @param {number} rowIndex - The zero-based index of the row to select
+     * 
+     * @returns {Promise<boolean>} True if successful, false otherwise
+     */
+    selectTableRow(rowIndex: number): Promise<boolean>;
+
+    /**
+     * Selects a specific column in the table.
+     * 
+     * @param {number} columnIndex - The zero-based index of the column to select
+     * 
+     * @returns {Promise<boolean>} True if successful, false otherwise
+     */
+    selectTableColumn(columnIndex: number): Promise<boolean>;
+
+    /**
+     * Selects the entire table.
+     * 
+     * @returns {Promise<boolean>} True if successful, false otherwise
+     */
+    selectEntireTable(): Promise<boolean>;
+
+    /**
+     * Clears any current table selection.
+     * 
+     * @returns {Promise<boolean>} True if successful, false otherwise
+     */
+    clearTableSelection(): Promise<boolean>;
+
+    /**
+     * Lists all metadata keys and values on the current table group.
+     * This is a diagnostic function to verify metadata is being stored correctly.
+     * 
+     * @returns {void}
+     */
+    listNodeMetadata(): void;
+    
+    /**
+     * Registers a handler for document selection changes.
+     * This allows the add-on to monitor when the user selects different objects
+     * and detect when tables created by this add-on are selected.
+     * 
+     * @returns {Promise<void>}
+     */
+    registerSelectionChangeHandler(): Promise<void>;
+    
+    /**
+     * Helper method to check the current selection for tables.
+     * This can be called at any time to analyze the current selection
+     * and update the current table reference if a table is selected.
+     * 
+     * @returns {Promise<void>}
+     */
+    checkCurrentSelection(): Promise<void>;
 }
